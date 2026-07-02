@@ -18,6 +18,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/entc/integration/edgeschema/ent/friendship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/group"
+	"entgo.io/ent/entc/integration/edgeschema/ent/parentship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/predicate"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/role"
@@ -33,22 +34,26 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx              *QueryContext
-	order            []user.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.User
-	withGroups       *GroupQuery
-	withFriends      *UserQuery
-	withRelatives    *UserQuery
-	withLikedTweets  *TweetQuery
-	withTweets       *TweetQuery
-	withRoles        *RoleQuery
-	withJoinedGroups *UserGroupQuery
-	withFriendships  *FriendshipQuery
-	withRelationship *RelationshipQuery
-	withLikes        *TweetLikeQuery
-	withUserTweets   *UserTweetQuery
-	withRolesUsers   *RoleUserQuery
+	ctx                   *QueryContext
+	order                 []user.OrderOption
+	inters                []Interceptor
+	predicates            []predicate.User
+	withGroups            *GroupQuery
+	withFriends           *UserQuery
+	withRelatives         *UserQuery
+	withChildren          *UserQuery
+	withParents           *UserQuery
+	withLikedTweets       *TweetQuery
+	withTweets            *TweetQuery
+	withRoles             *RoleQuery
+	withJoinedGroups      *UserGroupQuery
+	withFriendships       *FriendshipQuery
+	withRelationship      *RelationshipQuery
+	withChildParentships  *ParentshipQuery
+	withParentParentships *ParentshipQuery
+	withLikes             *TweetLikeQuery
+	withUserTweets        *UserTweetQuery
+	withRolesUsers        *RoleUserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -144,6 +149,50 @@ func (_q *UserQuery) QueryRelatives() *UserQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.RelativesTable, user.RelativesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryChildren chains the current query on the "children" edge.
+func (_q *UserQuery) QueryChildren() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, user.ChildrenTable, user.ChildrenPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParents chains the current query on the "parents" edge.
+func (_q *UserQuery) QueryParents() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.ParentsTable, user.ParentsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -276,6 +325,50 @@ func (_q *UserQuery) QueryRelationship() *RelationshipQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(relationship.Table, relationship.UserColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.RelationshipTable, user.RelationshipColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryChildParentships chains the current query on the "child_parentships" edge.
+func (_q *UserQuery) QueryChildParentships() *ParentshipQuery {
+	query := (&ParentshipClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(parentship.Table, parentship.ParentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.ChildParentshipsTable, user.ChildParentshipsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParentParentships chains the current query on the "parent_parentships" edge.
+func (_q *UserQuery) QueryParentParentships() *ParentshipQuery {
+	query := (&ParentshipClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(parentship.Table, parentship.ChildColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.ParentParentshipsTable, user.ParentParentshipsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -536,23 +629,27 @@ func (_q *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:           _q.config,
-		ctx:              _q.ctx.Clone(),
-		order:            append([]user.OrderOption{}, _q.order...),
-		inters:           append([]Interceptor{}, _q.inters...),
-		predicates:       append([]predicate.User{}, _q.predicates...),
-		withGroups:       _q.withGroups.Clone(),
-		withFriends:      _q.withFriends.Clone(),
-		withRelatives:    _q.withRelatives.Clone(),
-		withLikedTweets:  _q.withLikedTweets.Clone(),
-		withTweets:       _q.withTweets.Clone(),
-		withRoles:        _q.withRoles.Clone(),
-		withJoinedGroups: _q.withJoinedGroups.Clone(),
-		withFriendships:  _q.withFriendships.Clone(),
-		withRelationship: _q.withRelationship.Clone(),
-		withLikes:        _q.withLikes.Clone(),
-		withUserTweets:   _q.withUserTweets.Clone(),
-		withRolesUsers:   _q.withRolesUsers.Clone(),
+		config:                _q.config,
+		ctx:                   _q.ctx.Clone(),
+		order:                 append([]user.OrderOption{}, _q.order...),
+		inters:                append([]Interceptor{}, _q.inters...),
+		predicates:            append([]predicate.User{}, _q.predicates...),
+		withGroups:            _q.withGroups.Clone(),
+		withFriends:           _q.withFriends.Clone(),
+		withRelatives:         _q.withRelatives.Clone(),
+		withChildren:          _q.withChildren.Clone(),
+		withParents:           _q.withParents.Clone(),
+		withLikedTweets:       _q.withLikedTweets.Clone(),
+		withTweets:            _q.withTweets.Clone(),
+		withRoles:             _q.withRoles.Clone(),
+		withJoinedGroups:      _q.withJoinedGroups.Clone(),
+		withFriendships:       _q.withFriendships.Clone(),
+		withRelationship:      _q.withRelationship.Clone(),
+		withChildParentships:  _q.withChildParentships.Clone(),
+		withParentParentships: _q.withParentParentships.Clone(),
+		withLikes:             _q.withLikes.Clone(),
+		withUserTweets:        _q.withUserTweets.Clone(),
+		withRolesUsers:        _q.withRolesUsers.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -589,6 +686,28 @@ func (_q *UserQuery) WithRelatives(opts ...func(*UserQuery)) *UserQuery {
 		opt(query)
 	}
 	_q.withRelatives = query
+	return _q
+}
+
+// WithChildren tells the query-builder to eager-load the nodes that are connected to
+// the "children" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithChildren(opts ...func(*UserQuery)) *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withChildren = query
+	return _q
+}
+
+// WithParents tells the query-builder to eager-load the nodes that are connected to
+// the "parents" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithParents(opts ...func(*UserQuery)) *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withParents = query
 	return _q
 }
 
@@ -655,6 +774,28 @@ func (_q *UserQuery) WithRelationship(opts ...func(*RelationshipQuery)) *UserQue
 		opt(query)
 	}
 	_q.withRelationship = query
+	return _q
+}
+
+// WithChildParentships tells the query-builder to eager-load the nodes that are connected to
+// the "child_parentships" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithChildParentships(opts ...func(*ParentshipQuery)) *UserQuery {
+	query := (&ParentshipClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withChildParentships = query
+	return _q
+}
+
+// WithParentParentships tells the query-builder to eager-load the nodes that are connected to
+// the "parent_parentships" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithParentParentships(opts ...func(*ParentshipQuery)) *UserQuery {
+	query := (&ParentshipClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withParentParentships = query
 	return _q
 }
 
@@ -775,16 +916,20 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = _q.querySpec()
-		loadedTypes = [12]bool{
+		loadedTypes = [16]bool{
 			_q.withGroups != nil,
 			_q.withFriends != nil,
 			_q.withRelatives != nil,
+			_q.withChildren != nil,
+			_q.withParents != nil,
 			_q.withLikedTweets != nil,
 			_q.withTweets != nil,
 			_q.withRoles != nil,
 			_q.withJoinedGroups != nil,
 			_q.withFriendships != nil,
 			_q.withRelationship != nil,
+			_q.withChildParentships != nil,
+			_q.withParentParentships != nil,
 			_q.withLikes != nil,
 			_q.withUserTweets != nil,
 			_q.withRolesUsers != nil,
@@ -829,6 +974,20 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
+	if query := _q.withChildren; query != nil {
+		if err := _q.loadChildren(ctx, query, nodes,
+			func(n *User) { n.Edges.Children = []*User{} },
+			func(n *User, e *User) { n.Edges.Children = append(n.Edges.Children, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withParents; query != nil {
+		if err := _q.loadParents(ctx, query, nodes,
+			func(n *User) { n.Edges.Parents = []*User{} },
+			func(n *User, e *User) { n.Edges.Parents = append(n.Edges.Parents, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withLikedTweets; query != nil {
 		if err := _q.loadLikedTweets(ctx, query, nodes,
 			func(n *User) { n.Edges.LikedTweets = []*Tweet{} },
@@ -868,6 +1027,20 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := _q.loadRelationship(ctx, query, nodes,
 			func(n *User) { n.Edges.Relationship = []*Relationship{} },
 			func(n *User, e *Relationship) { n.Edges.Relationship = append(n.Edges.Relationship, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withChildParentships; query != nil {
+		if err := _q.loadChildParentships(ctx, query, nodes,
+			func(n *User) { n.Edges.ChildParentships = []*Parentship{} },
+			func(n *User, e *Parentship) { n.Edges.ChildParentships = append(n.Edges.ChildParentships, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withParentParentships; query != nil {
+		if err := _q.loadParentParentships(ctx, query, nodes,
+			func(n *User) { n.Edges.ParentParentships = []*Parentship{} },
+			func(n *User, e *Parentship) { n.Edges.ParentParentships = append(n.Edges.ParentParentships, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1071,6 +1244,128 @@ func (_q *UserQuery) loadRelatives(ctx context.Context, query *UserQuery, nodes 
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "relatives" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (_q *UserQuery) loadChildren(ctx context.Context, query *UserQuery, nodes []*User, init func(*User), assign func(*User, *User)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.ChildrenTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(user.ChildrenPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(user.ChildrenPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.ChildrenPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "children" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (_q *UserQuery) loadParents(ctx context.Context, query *UserQuery, nodes []*User, init func(*User), assign func(*User, *User)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.ParentsTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(user.ParentsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.ParentsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.ParentsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "parents" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -1346,6 +1641,66 @@ func (_q *UserQuery) loadRelationship(ctx context.Context, query *RelationshipQu
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *UserQuery) loadChildParentships(ctx context.Context, query *ParentshipQuery, nodes []*User, init func(*User), assign func(*User, *Parentship)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(parentship.FieldParentID)
+	}
+	query.Where(predicate.Parentship(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.ChildParentshipsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ParentID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "parent_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *UserQuery) loadParentParentships(ctx context.Context, query *ParentshipQuery, nodes []*User, init func(*User), assign func(*User, *Parentship)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(parentship.FieldChildID)
+	}
+	query.Where(predicate.Parentship(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.ParentParentshipsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChildID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "child_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}

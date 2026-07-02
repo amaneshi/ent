@@ -448,6 +448,14 @@ func (g *Graph) resolve(t *Type) error {
 				e.Rel.Type, ref.Rel.Type = M2M, M2M
 				table = e.Type.Label() + "_" + ref.Name
 				c1, c2 := ref.Owner.Label()+"_id", ref.Type.Label()+"_id"
+				// If the relation column is in the assoc side.
+				if e.def.Through != nil && e.def.Through.C != nil {
+					c1 = *e.def.Through.C
+				}
+				// If the relation column is in the inverse side.
+				if ref.def.Through != nil && ref.def.Through.C != nil {
+					c2 = *ref.def.Through.C
+				}
 				// If the relation is from the same type: User has Friends ([]User),
 				// we give the second column a different name (the relation name).
 				if c1 == c2 {

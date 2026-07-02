@@ -12,20 +12,26 @@ import (
 
 // A Descriptor for edge configuration.
 type Descriptor struct {
-	Tag         string                 // struct tag.
-	Type        string                 // edge type.
-	Name        string                 // edge name.
-	Field       string                 // edge field name (e.g. foreign-key).
-	RefName     string                 // ref name; inverse only.
-	Ref         *Descriptor            // edge reference; to/from of the same type.
-	Through     *struct{ N, T string } // through type and name.
-	Unique      bool                   // unique edge.
-	Inverse     bool                   // inverse edge.
-	Required    bool                   // required on creation.
-	Immutable   bool                   // create only edge.
-	StorageKey  *StorageKey            // optional storage-key configuration.
-	Annotations []schema.Annotation    // edge annotations.
-	Comment     string                 // edge comment.
+	Tag         string              // struct tag.
+	Type        string              // edge type.
+	Name        string              // edge name.
+	Field       string              // edge field name (e.g. foreign-key).
+	RefName     string              // ref name; inverse only.
+	Ref         *Descriptor         // edge reference; to/from of the same type.
+	Through     *Through            // through type and name.
+	Unique      bool                // unique edge.
+	Inverse     bool                // inverse edge.
+	Required    bool                // required on creation.
+	Immutable   bool                // create only edge.
+	StorageKey  *StorageKey         // optional storage-key configuration.
+	Annotations []schema.Annotation // edge annotations.
+	Comment     string              // edge comment.
+}
+
+// Through represents edge schema through struct
+type Through struct {
+	N, T string
+	C    *string
 }
 
 // To defines an association edge between two vertices.
@@ -98,8 +104,11 @@ func (b *assocBuilder) Field(f string) *assocBuilder {
 //
 //	edge.To("friends", User.Type).
 //		Through("friendships", Friendship.Type)
-func (b *assocBuilder) Through(name string, t any) *assocBuilder {
-	b.desc.Through = &struct{ N, T string }{N: name, T: typ(t)}
+func (b *assocBuilder) Through(name string, t any, opts ...ThroughOption) *assocBuilder {
+	b.desc.Through = &Through{N: name, T: typ(t)}
+	for i := range opts {
+		opts[i](b.desc.Through)
+	}
 	return b
 }
 
@@ -200,8 +209,11 @@ func (b *inverseBuilder) Field(f string) *inverseBuilder {
 //	edge.From("liked_users", User.Type).
 //		Ref("liked_tweets").
 //		Through("likes", TweetLike.Type)
-func (b *inverseBuilder) Through(name string, t any) *inverseBuilder {
-	b.desc.Through = &struct{ N, T string }{N: name, T: typ(t)}
+func (b *inverseBuilder) Through(name string, t any, opts ...ThroughOption) *inverseBuilder {
+	b.desc.Through = &Through{N: name, T: typ(t)}
+	for i := range opts {
+		opts[i](b.desc.Through)
+	}
 	return b
 }
 
@@ -272,5 +284,15 @@ func Column(name string) StorageOption {
 func Columns(to, from string) StorageOption {
 	return func(key *StorageKey) {
 		key.Columns = []string{to, from}
+	}
+}
+
+// ThroughOption allows for setting the through configuration using functional options.
+type ThroughOption func(*Through)
+
+// ThroughColumn sets the foreign-key column name option for M2M edges.
+func ThroughColumn(col string) ThroughOption {
+	return func(key *Through) {
+		key.C = &col
 	}
 }

@@ -151,7 +151,7 @@ services:
 
   postgres17:
     platform: linux/amd64
-    image: postgres:16
+    image: postgres:17
     environment:
       POSTGRES_DB: test
       POSTGRES_PASSWORD: pass

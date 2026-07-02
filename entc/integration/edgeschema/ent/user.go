@@ -36,6 +36,10 @@ type UserEdges struct {
 	Friends []*User `json:"friends,omitempty"`
 	// Relatives holds the value of the relatives edge.
 	Relatives []*User `json:"relatives,omitempty"`
+	// Children holds the value of the children edge.
+	Children []*User `json:"children,omitempty"`
+	// Parents holds the value of the parents edge.
+	Parents []*User `json:"parents,omitempty"`
 	// LikedTweets holds the value of the liked_tweets edge.
 	LikedTweets []*Tweet `json:"liked_tweets,omitempty"`
 	// Tweets holds the value of the tweets edge.
@@ -48,6 +52,10 @@ type UserEdges struct {
 	Friendships []*Friendship `json:"friendships,omitempty"`
 	// Relationship holds the value of the relationship edge.
 	Relationship []*Relationship `json:"relationship,omitempty"`
+	// ChildParentships holds the value of the child_parentships edge.
+	ChildParentships []*Parentship `json:"child_parentships,omitempty"`
+	// ParentParentships holds the value of the parent_parentships edge.
+	ParentParentships []*Parentship `json:"parent_parentships,omitempty"`
 	// Likes holds the value of the likes edge.
 	Likes []*TweetLike `json:"likes,omitempty"`
 	// UserTweets holds the value of the user_tweets edge.
@@ -56,7 +64,7 @@ type UserEdges struct {
 	RolesUsers []*RoleUser `json:"roles_users,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [12]bool
+	loadedTypes [16]bool
 }
 
 // GroupsOrErr returns the Groups value or an error if the edge
@@ -86,10 +94,28 @@ func (e UserEdges) RelativesOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "relatives"}
 }
 
+// ChildrenOrErr returns the Children value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ChildrenOrErr() ([]*User, error) {
+	if e.loadedTypes[3] {
+		return e.Children, nil
+	}
+	return nil, &NotLoadedError{edge: "children"}
+}
+
+// ParentsOrErr returns the Parents value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ParentsOrErr() ([]*User, error) {
+	if e.loadedTypes[4] {
+		return e.Parents, nil
+	}
+	return nil, &NotLoadedError{edge: "parents"}
+}
+
 // LikedTweetsOrErr returns the LikedTweets value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) LikedTweetsOrErr() ([]*Tweet, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[5] {
 		return e.LikedTweets, nil
 	}
 	return nil, &NotLoadedError{edge: "liked_tweets"}
@@ -98,7 +124,7 @@ func (e UserEdges) LikedTweetsOrErr() ([]*Tweet, error) {
 // TweetsOrErr returns the Tweets value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) TweetsOrErr() ([]*Tweet, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[6] {
 		return e.Tweets, nil
 	}
 	return nil, &NotLoadedError{edge: "tweets"}
@@ -107,7 +133,7 @@ func (e UserEdges) TweetsOrErr() ([]*Tweet, error) {
 // RolesOrErr returns the Roles value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) RolesOrErr() ([]*Role, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[7] {
 		return e.Roles, nil
 	}
 	return nil, &NotLoadedError{edge: "roles"}
@@ -116,7 +142,7 @@ func (e UserEdges) RolesOrErr() ([]*Role, error) {
 // JoinedGroupsOrErr returns the JoinedGroups value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) JoinedGroupsOrErr() ([]*UserGroup, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[8] {
 		return e.JoinedGroups, nil
 	}
 	return nil, &NotLoadedError{edge: "joined_groups"}
@@ -125,7 +151,7 @@ func (e UserEdges) JoinedGroupsOrErr() ([]*UserGroup, error) {
 // FriendshipsOrErr returns the Friendships value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) FriendshipsOrErr() ([]*Friendship, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[9] {
 		return e.Friendships, nil
 	}
 	return nil, &NotLoadedError{edge: "friendships"}
@@ -134,16 +160,34 @@ func (e UserEdges) FriendshipsOrErr() ([]*Friendship, error) {
 // RelationshipOrErr returns the Relationship value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) RelationshipOrErr() ([]*Relationship, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[10] {
 		return e.Relationship, nil
 	}
 	return nil, &NotLoadedError{edge: "relationship"}
 }
 
+// ChildParentshipsOrErr returns the ChildParentships value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ChildParentshipsOrErr() ([]*Parentship, error) {
+	if e.loadedTypes[11] {
+		return e.ChildParentships, nil
+	}
+	return nil, &NotLoadedError{edge: "child_parentships"}
+}
+
+// ParentParentshipsOrErr returns the ParentParentships value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ParentParentshipsOrErr() ([]*Parentship, error) {
+	if e.loadedTypes[12] {
+		return e.ParentParentships, nil
+	}
+	return nil, &NotLoadedError{edge: "parent_parentships"}
+}
+
 // LikesOrErr returns the Likes value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) LikesOrErr() ([]*TweetLike, error) {
-	if e.loadedTypes[9] {
+	if e.loadedTypes[13] {
 		return e.Likes, nil
 	}
 	return nil, &NotLoadedError{edge: "likes"}
@@ -152,7 +196,7 @@ func (e UserEdges) LikesOrErr() ([]*TweetLike, error) {
 // UserTweetsOrErr returns the UserTweets value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) UserTweetsOrErr() ([]*UserTweet, error) {
-	if e.loadedTypes[10] {
+	if e.loadedTypes[14] {
 		return e.UserTweets, nil
 	}
 	return nil, &NotLoadedError{edge: "user_tweets"}
@@ -161,7 +205,7 @@ func (e UserEdges) UserTweetsOrErr() ([]*UserTweet, error) {
 // RolesUsersOrErr returns the RolesUsers value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) RolesUsersOrErr() ([]*RoleUser, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[15] {
 		return e.RolesUsers, nil
 	}
 	return nil, &NotLoadedError{edge: "roles_users"}
@@ -231,6 +275,16 @@ func (_m *User) QueryRelatives() *UserQuery {
 	return NewUserClient(_m.config).QueryRelatives(_m)
 }
 
+// QueryChildren queries the "children" edge of the User entity.
+func (_m *User) QueryChildren() *UserQuery {
+	return NewUserClient(_m.config).QueryChildren(_m)
+}
+
+// QueryParents queries the "parents" edge of the User entity.
+func (_m *User) QueryParents() *UserQuery {
+	return NewUserClient(_m.config).QueryParents(_m)
+}
+
 // QueryLikedTweets queries the "liked_tweets" edge of the User entity.
 func (_m *User) QueryLikedTweets() *TweetQuery {
 	return NewUserClient(_m.config).QueryLikedTweets(_m)
@@ -259,6 +313,16 @@ func (_m *User) QueryFriendships() *FriendshipQuery {
 // QueryRelationship queries the "relationship" edge of the User entity.
 func (_m *User) QueryRelationship() *RelationshipQuery {
 	return NewUserClient(_m.config).QueryRelationship(_m)
+}
+
+// QueryChildParentships queries the "child_parentships" edge of the User entity.
+func (_m *User) QueryChildParentships() *ParentshipQuery {
+	return NewUserClient(_m.config).QueryChildParentships(_m)
+}
+
+// QueryParentParentships queries the "parent_parentships" edge of the User entity.
+func (_m *User) QueryParentParentships() *ParentshipQuery {
+	return NewUserClient(_m.config).QueryParentParentships(_m)
 }
 
 // QueryLikes queries the "likes" edge of the User entity.

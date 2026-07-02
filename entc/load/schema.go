@@ -67,20 +67,26 @@ type Field struct {
 
 // Edge represents an ent.Edge that was loaded from a complied user package.
 type Edge struct {
-	Name        string                 `json:"name,omitempty"`
-	Type        string                 `json:"type,omitempty"`
-	Tag         string                 `json:"tag,omitempty"`
-	Field       string                 `json:"field,omitempty"`
-	RefName     string                 `json:"ref_name,omitempty"`
-	Ref         *Edge                  `json:"ref,omitempty"`
-	Through     *struct{ N, T string } `json:"through,omitempty"`
-	Unique      bool                   `json:"unique,omitempty"`
-	Inverse     bool                   `json:"inverse,omitempty"`
-	Required    bool                   `json:"required,omitempty"`
-	Immutable   bool                   `json:"immutable,omitempty"`
-	StorageKey  *edge.StorageKey       `json:"storage_key,omitempty"`
-	Annotations map[string]any         `json:"annotations,omitempty"`
-	Comment     string                 `json:"comment,omitempty"`
+	Name        string           `json:"name,omitempty"`
+	Type        string           `json:"type,omitempty"`
+	Tag         string           `json:"tag,omitempty"`
+	Field       string           `json:"field,omitempty"`
+	RefName     string           `json:"ref_name,omitempty"`
+	Ref         *Edge            `json:"ref,omitempty"`
+	Through     *Through         `json:"through,omitempty"`
+	Unique      bool             `json:"unique,omitempty"`
+	Inverse     bool             `json:"inverse,omitempty"`
+	Required    bool             `json:"required,omitempty"`
+	Immutable   bool             `json:"immutable,omitempty"`
+	StorageKey  *edge.StorageKey `json:"storage_key,omitempty"`
+	Annotations map[string]any   `json:"annotations,omitempty"`
+	Comment     string           `json:"comment,omitempty"`
+}
+
+// Through represents edge schema through struct
+type Through struct {
+	N, T string
+	C    *string
 }
 
 // Index represents an ent.Index that was loaded from a complied user package.
@@ -104,10 +110,16 @@ func NewEdge(ed *edge.Descriptor) *Edge {
 		Required:    ed.Required,
 		Immutable:   ed.Immutable,
 		RefName:     ed.RefName,
-		Through:     ed.Through,
 		StorageKey:  ed.StorageKey,
 		Comment:     ed.Comment,
 		Annotations: make(map[string]any),
+	}
+	if ed.Through != nil {
+		ne.Through = &Through{
+			N: ed.Through.N,
+			T: ed.Through.T,
+			C: ed.Through.C,
+		}
 	}
 	for _, at := range ed.Annotations {
 		ne.addAnnotation(at)

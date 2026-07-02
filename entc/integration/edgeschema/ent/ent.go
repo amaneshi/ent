@@ -21,6 +21,7 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/friendship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/group"
 	"entgo.io/ent/entc/integration/edgeschema/ent/grouptag"
+	"entgo.io/ent/entc/integration/edgeschema/ent/parentship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/process"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationshipinfo"
@@ -98,6 +99,7 @@ func checkColumn(t, c string) error {
 			friendship.Table:       friendship.ValidColumn,
 			group.Table:            group.ValidColumn,
 			grouptag.Table:         grouptag.ValidColumn,
+			parentship.Table:       parentship.ValidColumn,
 			process.Table:          process.ValidColumn,
 			relationship.Table:     relationship.ValidColumn,
 			relationshipinfo.Table: relationshipinfo.ValidColumn,

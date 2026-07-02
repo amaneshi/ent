@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/friendship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/group"
 	"entgo.io/ent/entc/integration/edgeschema/ent/grouptag"
+	"entgo.io/ent/entc/integration/edgeschema/ent/parentship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/predicate"
 	"entgo.io/ent/entc/integration/edgeschema/ent/process"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationship"
@@ -34,7 +35,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 17)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 18)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   attachedfile.Table,
@@ -113,6 +114,29 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[5] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
+			Table:   parentship.Table,
+			Columns: parentship.Columns,
+			CompositeID: []*sqlgraph.FieldSpec{
+				{
+					Type:   field.TypeInt,
+					Column: parentship.FieldChildID,
+				},
+				{
+					Type:   field.TypeInt,
+					Column: parentship.FieldParentID,
+				},
+			},
+		},
+		Type: "Parentship",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			parentship.FieldWeight:    {Type: field.TypeInt, Column: parentship.FieldWeight},
+			parentship.FieldCreatedAt: {Type: field.TypeTime, Column: parentship.FieldCreatedAt},
+			parentship.FieldParentID:  {Type: field.TypeInt, Column: parentship.FieldParentID},
+			parentship.FieldChildID:   {Type: field.TypeInt, Column: parentship.FieldChildID},
+		},
+	}
+	graph.Nodes[6] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
 			Table:   process.Table,
 			Columns: process.Columns,
 			ID: &sqlgraph.FieldSpec{
@@ -123,7 +147,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Type:   "Process",
 		Fields: map[string]*sqlgraph.FieldSpec{},
 	}
-	graph.Nodes[6] = &sqlgraph.Node{
+	graph.Nodes[7] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   relationship.Table,
 			Columns: relationship.Columns,
@@ -146,7 +170,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			relationship.FieldInfoID:     {Type: field.TypeInt, Column: relationship.FieldInfoID},
 		},
 	}
-	graph.Nodes[7] = &sqlgraph.Node{
+	graph.Nodes[8] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   relationshipinfo.Table,
 			Columns: relationshipinfo.Columns,
@@ -160,7 +184,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			relationshipinfo.FieldText: {Type: field.TypeString, Column: relationshipinfo.FieldText},
 		},
 	}
-	graph.Nodes[8] = &sqlgraph.Node{
+	graph.Nodes[9] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   role.Table,
 			Columns: role.Columns,
@@ -175,7 +199,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			role.FieldCreatedAt: {Type: field.TypeTime, Column: role.FieldCreatedAt},
 		},
 	}
-	graph.Nodes[9] = &sqlgraph.Node{
+	graph.Nodes[10] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   roleuser.Table,
 			Columns: roleuser.Columns,
@@ -197,7 +221,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			roleuser.FieldUserID:    {Type: field.TypeInt, Column: roleuser.FieldUserID},
 		},
 	}
-	graph.Nodes[10] = &sqlgraph.Node{
+	graph.Nodes[11] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   tag.Table,
 			Columns: tag.Columns,
@@ -211,7 +235,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			tag.FieldValue: {Type: field.TypeString, Column: tag.FieldValue},
 		},
 	}
-	graph.Nodes[11] = &sqlgraph.Node{
+	graph.Nodes[12] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   tweet.Table,
 			Columns: tweet.Columns,
@@ -225,7 +249,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			tweet.FieldText: {Type: field.TypeString, Column: tweet.FieldText},
 		},
 	}
-	graph.Nodes[12] = &sqlgraph.Node{
+	graph.Nodes[13] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   tweetlike.Table,
 			Columns: tweetlike.Columns,
@@ -247,7 +271,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			tweetlike.FieldTweetID: {Type: field.TypeInt, Column: tweetlike.FieldTweetID},
 		},
 	}
-	graph.Nodes[13] = &sqlgraph.Node{
+	graph.Nodes[14] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   tweettag.Table,
 			Columns: tweettag.Columns,
@@ -263,7 +287,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			tweettag.FieldTweetID: {Type: field.TypeInt, Column: tweettag.FieldTweetID},
 		},
 	}
-	graph.Nodes[14] = &sqlgraph.Node{
+	graph.Nodes[15] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -277,7 +301,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			user.FieldName: {Type: field.TypeString, Column: user.FieldName},
 		},
 	}
-	graph.Nodes[15] = &sqlgraph.Node{
+	graph.Nodes[16] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   usergroup.Table,
 			Columns: usergroup.Columns,
@@ -293,7 +317,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			usergroup.FieldGroupID:  {Type: field.TypeInt, Column: usergroup.FieldGroupID},
 		},
 	}
-	graph.Nodes[16] = &sqlgraph.Node{
+	graph.Nodes[17] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   usertweet.Table,
 			Columns: usertweet.Columns,
@@ -440,6 +464,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"GroupTag",
 		"Group",
+	)
+	graph.MustAddE(
+		"parent",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   parentship.ParentTable,
+			Columns: []string{parentship.ParentColumn},
+			Bidi:    false,
+		},
+		"Parentship",
+		"User",
+	)
+	graph.MustAddE(
+		"child",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   parentship.ChildTable,
+			Columns: []string{parentship.ChildColumn},
+			Bidi:    false,
+		},
+		"Parentship",
+		"User",
 	)
 	graph.MustAddE(
 		"files",
@@ -754,6 +802,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"User",
 	)
 	graph.MustAddE(
+		"children",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.ChildrenTable,
+			Columns: user.ChildrenPrimaryKey,
+			Bidi:    false,
+		},
+		"User",
+		"User",
+	)
+	graph.MustAddE(
+		"parents",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.ParentsTable,
+			Columns: user.ParentsPrimaryKey,
+			Bidi:    false,
+		},
+		"User",
+		"User",
+	)
+	graph.MustAddE(
 		"liked_tweets",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -824,6 +896,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"User",
 		"Relationship",
+	)
+	graph.MustAddE(
+		"child_parentships",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ChildParentshipsTable,
+			Columns: []string{user.ChildParentshipsColumn},
+			Bidi:    false,
+		},
+		"User",
+		"Parentship",
+	)
+	graph.MustAddE(
+		"parent_parentships",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.ParentParentshipsTable,
+			Columns: []string{user.ParentParentshipsColumn},
+			Bidi:    false,
+		},
+		"User",
+		"Parentship",
 	)
 	graph.MustAddE(
 		"likes",
@@ -1328,6 +1424,89 @@ func (f *GroupTagFilter) WhereHasGroupWith(preds ...predicate.Group) {
 }
 
 // addPredicate implements the predicateAdder interface.
+func (_q *ParentshipQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the ParentshipQuery builder.
+func (_q *ParentshipQuery) Filter() *ParentshipFilter {
+	return &ParentshipFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *ParentshipMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.Where(pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the ParentshipMutation builder.
+func (m *ParentshipMutation) Filter() *ParentshipFilter {
+	return &ParentshipFilter{config: m.config, predicateAdder: m}
+}
+
+// ParentshipFilter provides a generic filtering capability at runtime for ParentshipQuery.
+type ParentshipFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *ParentshipFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereWeight applies the entql int predicate on the weight field.
+func (f *ParentshipFilter) WhereWeight(p entql.IntP) {
+	f.Where(p.Field(parentship.FieldWeight))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *ParentshipFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(parentship.FieldCreatedAt))
+}
+
+// WhereParentID applies the entql int predicate on the parent_id field.
+func (f *ParentshipFilter) WhereParentID(p entql.IntP) {
+	f.Where(p.Field(parentship.FieldParentID))
+}
+
+// WhereChildID applies the entql int predicate on the child_id field.
+func (f *ParentshipFilter) WhereChildID(p entql.IntP) {
+	f.Where(p.Field(parentship.FieldChildID))
+}
+
+// WhereHasParent applies a predicate to check if query has an edge parent.
+func (f *ParentshipFilter) WhereHasParent() {
+	f.Where(entql.HasEdge("parent"))
+}
+
+// WhereHasParentWith applies a predicate to check if query has an edge parent with a given conditions (other predicates).
+func (f *ParentshipFilter) WhereHasParentWith(preds ...predicate.User) {
+	f.Where(entql.HasEdgeWith("parent", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasChild applies a predicate to check if query has an edge child.
+func (f *ParentshipFilter) WhereHasChild() {
+	f.Where(entql.HasEdge("child"))
+}
+
+// WhereHasChildWith applies a predicate to check if query has an edge child with a given conditions (other predicates).
+func (f *ParentshipFilter) WhereHasChildWith(preds ...predicate.User) {
+	f.Where(entql.HasEdgeWith("child", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (_q *ProcessQuery) addPredicate(pred func(s *sql.Selector)) {
 	_q.predicates = append(_q.predicates, pred)
 }
@@ -1356,7 +1535,7 @@ type ProcessFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *ProcessFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1424,7 +1603,7 @@ type RelationshipFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RelationshipFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1521,7 +1700,7 @@ type RelationshipInfoFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RelationshipInfoFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[8].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1566,7 +1745,7 @@ type RoleFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RoleFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[8].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[9].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1644,7 +1823,7 @@ type RoleUserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RoleUserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[9].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[10].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1722,7 +1901,7 @@ type TagFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TagFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[10].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[11].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1823,7 +2002,7 @@ type TweetFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TweetFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[11].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[12].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1952,7 +2131,7 @@ type TweetLikeFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TweetLikeFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[12].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[13].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2030,7 +2209,7 @@ type TweetTagFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TweetTagFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[13].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[14].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2113,7 +2292,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[14].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[15].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2165,6 +2344,34 @@ func (f *UserFilter) WhereHasRelatives() {
 // WhereHasRelativesWith applies a predicate to check if query has an edge relatives with a given conditions (other predicates).
 func (f *UserFilter) WhereHasRelativesWith(preds ...predicate.User) {
 	f.Where(entql.HasEdgeWith("relatives", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasChildren applies a predicate to check if query has an edge children.
+func (f *UserFilter) WhereHasChildren() {
+	f.Where(entql.HasEdge("children"))
+}
+
+// WhereHasChildrenWith applies a predicate to check if query has an edge children with a given conditions (other predicates).
+func (f *UserFilter) WhereHasChildrenWith(preds ...predicate.User) {
+	f.Where(entql.HasEdgeWith("children", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasParents applies a predicate to check if query has an edge parents.
+func (f *UserFilter) WhereHasParents() {
+	f.Where(entql.HasEdge("parents"))
+}
+
+// WhereHasParentsWith applies a predicate to check if query has an edge parents with a given conditions (other predicates).
+func (f *UserFilter) WhereHasParentsWith(preds ...predicate.User) {
+	f.Where(entql.HasEdgeWith("parents", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -2255,6 +2462,34 @@ func (f *UserFilter) WhereHasRelationshipWith(preds ...predicate.Relationship) {
 	})))
 }
 
+// WhereHasChildParentships applies a predicate to check if query has an edge child_parentships.
+func (f *UserFilter) WhereHasChildParentships() {
+	f.Where(entql.HasEdge("child_parentships"))
+}
+
+// WhereHasChildParentshipsWith applies a predicate to check if query has an edge child_parentships with a given conditions (other predicates).
+func (f *UserFilter) WhereHasChildParentshipsWith(preds ...predicate.Parentship) {
+	f.Where(entql.HasEdgeWith("child_parentships", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasParentParentships applies a predicate to check if query has an edge parent_parentships.
+func (f *UserFilter) WhereHasParentParentships() {
+	f.Where(entql.HasEdge("parent_parentships"))
+}
+
+// WhereHasParentParentshipsWith applies a predicate to check if query has an edge parent_parentships with a given conditions (other predicates).
+func (f *UserFilter) WhereHasParentParentshipsWith(preds ...predicate.Parentship) {
+	f.Where(entql.HasEdgeWith("parent_parentships", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
 // WhereHasLikes applies a predicate to check if query has an edge likes.
 func (f *UserFilter) WhereHasLikes() {
 	f.Where(entql.HasEdge("likes"))
@@ -2326,7 +2561,7 @@ type UserGroupFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserGroupFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[15].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[16].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2409,7 +2644,7 @@ type UserTweetFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserTweetFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[16].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[17].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

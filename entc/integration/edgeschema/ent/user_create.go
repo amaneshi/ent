@@ -90,6 +90,36 @@ func (_c *UserCreate) AddRelatives(v ...*User) *UserCreate {
 	return _c.AddRelativeIDs(ids...)
 }
 
+// AddChildIDs adds the "children" edge to the User entity by IDs.
+func (_c *UserCreate) AddChildIDs(ids ...int) *UserCreate {
+	_c.mutation.AddChildIDs(ids...)
+	return _c
+}
+
+// AddChildren adds the "children" edges to the User entity.
+func (_c *UserCreate) AddChildren(v ...*User) *UserCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddChildIDs(ids...)
+}
+
+// AddParentIDs adds the "parents" edge to the User entity by IDs.
+func (_c *UserCreate) AddParentIDs(ids ...int) *UserCreate {
+	_c.mutation.AddParentIDs(ids...)
+	return _c
+}
+
+// AddParents adds the "parents" edges to the User entity.
+func (_c *UserCreate) AddParents(v ...*User) *UserCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddParentIDs(ids...)
+}
+
 // AddLikedTweetIDs adds the "liked_tweets" edge to the Tweet entity by IDs.
 func (_c *UserCreate) AddLikedTweetIDs(ids ...int) *UserCreate {
 	_c.mutation.AddLikedTweetIDs(ids...)
@@ -315,6 +345,46 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &RelationshipCreate{config: _c.config, mutation: newRelationshipMutation(_c.config, OpCreate)}
+		_ = createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.ChildrenTable,
+			Columns: user.ChildrenPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &ParentshipCreate{config: _c.config, mutation: newParentshipMutation(_c.config, OpCreate)}
+		_ = createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ParentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.ParentsTable,
+			Columns: user.ParentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &ParentshipCreate{config: _c.config, mutation: newParentshipMutation(_c.config, OpCreate)}
 		_ = createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields

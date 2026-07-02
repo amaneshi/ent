@@ -26,6 +26,8 @@ type Tx struct {
 	Group *GroupClient
 	// GroupTag is the client for interacting with the GroupTag builders.
 	GroupTag *GroupTagClient
+	// Parentship is the client for interacting with the Parentship builders.
+	Parentship *ParentshipClient
 	// Process is the client for interacting with the Process builders.
 	Process *ProcessClient
 	// Relationship is the client for interacting with the Relationship builders.
@@ -186,6 +188,7 @@ func (tx *Tx) init() {
 	tx.Friendship = NewFriendshipClient(tx.config)
 	tx.Group = NewGroupClient(tx.config)
 	tx.GroupTag = NewGroupTagClient(tx.config)
+	tx.Parentship = NewParentshipClient(tx.config)
 	tx.Process = NewProcessClient(tx.config)
 	tx.Relationship = NewRelationshipClient(tx.config)
 	tx.RelationshipInfo = NewRelationshipInfoClient(tx.config)

@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/attachedfile"
 	"entgo.io/ent/entc/integration/edgeschema/ent/friendship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/group"
+	"entgo.io/ent/entc/integration/edgeschema/ent/parentship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/role"
 	"entgo.io/ent/entc/integration/edgeschema/ent/roleuser"
@@ -54,6 +55,25 @@ func init() {
 	groupDescName := groupFields[0].Descriptor()
 	// group.DefaultName holds the default value on creation for the name field.
 	group.DefaultName = groupDescName.Default.(string)
+	parentship.Policy = privacy.NewPolicies(schema.Parentship{})
+	parentship.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := parentship.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	parentshipFields := schema.Parentship{}.Fields()
+	_ = parentshipFields
+	// parentshipDescWeight is the schema descriptor for weight field.
+	parentshipDescWeight := parentshipFields[0].Descriptor()
+	// parentship.DefaultWeight holds the default value on creation for the weight field.
+	parentship.DefaultWeight = parentshipDescWeight.Default.(int)
+	// parentshipDescCreatedAt is the schema descriptor for created_at field.
+	parentshipDescCreatedAt := parentshipFields[1].Descriptor()
+	// parentship.DefaultCreatedAt holds the default value on creation for the created_at field.
+	parentship.DefaultCreatedAt = parentshipDescCreatedAt.Default.(func() time.Time)
 	relationship.Policy = privacy.NewPolicies(schema.Relationship{})
 	relationship.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {

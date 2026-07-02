@@ -33,6 +33,8 @@ func (User) Edges() []ent.Edge {
 			Through("friendships", Friendship.Type),
 		edge.To("relatives", User.Type).
 			Through("relationship", Relationship.Type),
+		edge.To("parents", User.Type).Through("parent_parentships", Parentship.Type, edge.ThroughColumn("parent_id")).
+			From("children").Through("child_parentships", Parentship.Type, edge.ThroughColumn("child_id")),
 		edge.To("liked_tweets", Tweet.Type).
 			Through("likes", TweetLike.Type),
 		edge.To("tweets", Tweet.Type).

@@ -235,6 +235,30 @@ func (f GroupTagMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutati
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.GroupTagMutation", m)
 }
 
+// The ParentshipQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type ParentshipQueryRuleFunc func(context.Context, *ent.ParentshipQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f ParentshipQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ParentshipQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.ParentshipQuery", q)
+}
+
+// The ParentshipMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type ParentshipMutationRuleFunc func(context.Context, *ent.ParentshipMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f ParentshipMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.ParentshipMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.ParentshipMutation", m)
+}
+
 // The ProcessQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type ProcessQueryRuleFunc func(context.Context, *ent.ProcessQuery) error
@@ -568,6 +592,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.GroupTagQuery:
 		return q.Filter(), nil
+	case *ent.ParentshipQuery:
+		return q.Filter(), nil
 	case *ent.ProcessQuery:
 		return q.Filter(), nil
 	case *ent.RelationshipQuery:
@@ -608,6 +634,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.GroupMutation:
 		return m.Filter(), nil
 	case *ent.GroupTagMutation:
+		return m.Filter(), nil
+	case *ent.ParentshipMutation:
 		return m.Filter(), nil
 	case *ent.ProcessMutation:
 		return m.Filter(), nil

@@ -25,6 +25,7 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/friendship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/group"
 	"entgo.io/ent/entc/integration/edgeschema/ent/grouptag"
+	"entgo.io/ent/entc/integration/edgeschema/ent/parentship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/process"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationshipinfo"
@@ -54,6 +55,8 @@ type Client struct {
 	Group *GroupClient
 	// GroupTag is the client for interacting with the GroupTag builders.
 	GroupTag *GroupTagClient
+	// Parentship is the client for interacting with the Parentship builders.
+	Parentship *ParentshipClient
 	// Process is the client for interacting with the Process builders.
 	Process *ProcessClient
 	// Relationship is the client for interacting with the Relationship builders.
@@ -94,6 +97,7 @@ func (c *Client) init() {
 	c.Friendship = NewFriendshipClient(c.config)
 	c.Group = NewGroupClient(c.config)
 	c.GroupTag = NewGroupTagClient(c.config)
+	c.Parentship = NewParentshipClient(c.config)
 	c.Process = NewProcessClient(c.config)
 	c.Relationship = NewRelationshipClient(c.config)
 	c.RelationshipInfo = NewRelationshipInfoClient(c.config)
@@ -203,6 +207,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Friendship:       NewFriendshipClient(cfg),
 		Group:            NewGroupClient(cfg),
 		GroupTag:         NewGroupTagClient(cfg),
+		Parentship:       NewParentshipClient(cfg),
 		Process:          NewProcessClient(cfg),
 		Relationship:     NewRelationshipClient(cfg),
 		RelationshipInfo: NewRelationshipInfoClient(cfg),
@@ -239,6 +244,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Friendship:       NewFriendshipClient(cfg),
 		Group:            NewGroupClient(cfg),
 		GroupTag:         NewGroupTagClient(cfg),
+		Parentship:       NewParentshipClient(cfg),
 		Process:          NewProcessClient(cfg),
 		Relationship:     NewRelationshipClient(cfg),
 		RelationshipInfo: NewRelationshipInfoClient(cfg),
@@ -280,9 +286,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AttachedFile, c.File, c.Friendship, c.Group, c.GroupTag, c.Process,
-		c.Relationship, c.RelationshipInfo, c.Role, c.RoleUser, c.Tag, c.Tweet,
-		c.TweetLike, c.TweetTag, c.User, c.UserGroup, c.UserTweet,
+		c.AttachedFile, c.File, c.Friendship, c.Group, c.GroupTag, c.Parentship,
+		c.Process, c.Relationship, c.RelationshipInfo, c.Role, c.RoleUser, c.Tag,
+		c.Tweet, c.TweetLike, c.TweetTag, c.User, c.UserGroup, c.UserTweet,
 	} {
 		n.Use(hooks...)
 	}
@@ -292,9 +298,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AttachedFile, c.File, c.Friendship, c.Group, c.GroupTag, c.Process,
-		c.Relationship, c.RelationshipInfo, c.Role, c.RoleUser, c.Tag, c.Tweet,
-		c.TweetLike, c.TweetTag, c.User, c.UserGroup, c.UserTweet,
+		c.AttachedFile, c.File, c.Friendship, c.Group, c.GroupTag, c.Parentship,
+		c.Process, c.Relationship, c.RelationshipInfo, c.Role, c.RoleUser, c.Tag,
+		c.Tweet, c.TweetLike, c.TweetTag, c.User, c.UserGroup, c.UserTweet,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -313,6 +319,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Group.mutate(ctx, m)
 	case *GroupTagMutation:
 		return c.GroupTag.mutate(ctx, m)
+	case *ParentshipMutation:
+		return c.Parentship.mutate(ctx, m)
 	case *ProcessMutation:
 		return c.Process.mutate(ctx, m)
 	case *RelationshipMutation:
@@ -1180,6 +1188,123 @@ func (c *GroupTagClient) mutate(ctx context.Context, m *GroupTagMutation) (Value
 		return (&GroupTagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown GroupTag mutation op: %q", m.Op())
+	}
+}
+
+// ParentshipClient is a client for the Parentship schema.
+type ParentshipClient struct {
+	config
+}
+
+// NewParentshipClient returns a client for the Parentship from the given config.
+func NewParentshipClient(c config) *ParentshipClient {
+	return &ParentshipClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `parentship.Hooks(f(g(h())))`.
+func (c *ParentshipClient) Use(hooks ...Hook) {
+	c.hooks.Parentship = append(c.hooks.Parentship, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `parentship.Intercept(f(g(h())))`.
+func (c *ParentshipClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Parentship = append(c.inters.Parentship, interceptors...)
+}
+
+// Create returns a builder for creating a Parentship entity.
+func (c *ParentshipClient) Create() *ParentshipCreate {
+	mutation := newParentshipMutation(c.config, OpCreate)
+	return &ParentshipCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Parentship entities.
+func (c *ParentshipClient) CreateBulk(builders ...*ParentshipCreate) *ParentshipCreateBulk {
+	return &ParentshipCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ParentshipClient) MapCreateBulk(slice any, setFunc func(*ParentshipCreate, int)) *ParentshipCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ParentshipCreateBulk{err: fmt.Errorf("calling to ParentshipClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ParentshipCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ParentshipCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Parentship.
+func (c *ParentshipClient) Update() *ParentshipUpdate {
+	mutation := newParentshipMutation(c.config, OpUpdate)
+	return &ParentshipUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ParentshipClient) UpdateOne(_m *Parentship) *ParentshipUpdateOne {
+	mutation := newParentshipMutation(c.config, OpUpdateOne)
+	mutation.SetChildID(_m.ChildID)
+	mutation.SetParentID(_m.ParentID)
+	return &ParentshipUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Parentship.
+func (c *ParentshipClient) Delete() *ParentshipDelete {
+	mutation := newParentshipMutation(c.config, OpDelete)
+	return &ParentshipDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for Parentship.
+func (c *ParentshipClient) Query() *ParentshipQuery {
+	return &ParentshipQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeParentship},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryParent queries the parent edge of a Parentship.
+func (c *ParentshipClient) QueryParent(_m *Parentship) *UserQuery {
+	return c.Query().
+		Where(parentship.ChildID(_m.ChildID), parentship.ParentID(_m.ParentID)).
+		QueryParent()
+}
+
+// QueryChild queries the child edge of a Parentship.
+func (c *ParentshipClient) QueryChild(_m *Parentship) *UserQuery {
+	return c.Query().
+		Where(parentship.ChildID(_m.ChildID), parentship.ParentID(_m.ParentID)).
+		QueryChild()
+}
+
+// Hooks returns the client hooks.
+func (c *ParentshipClient) Hooks() []Hook {
+	hooks := c.hooks.Parentship
+	return append(hooks[:len(hooks):len(hooks)], parentship.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *ParentshipClient) Interceptors() []Interceptor {
+	return c.inters.Parentship
+}
+
+func (c *ParentshipClient) mutate(ctx context.Context, m *ParentshipMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ParentshipCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ParentshipUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ParentshipUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ParentshipDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Parentship mutation op: %q", m.Op())
 	}
 }
 
@@ -2750,6 +2875,38 @@ func (c *UserClient) QueryRelatives(_m *User) *UserQuery {
 	return query
 }
 
+// QueryChildren queries the children edge of a User.
+func (c *UserClient) QueryChildren(_m *User) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, user.ChildrenTable, user.ChildrenPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParents queries the parents edge of a User.
+func (c *UserClient) QueryParents(_m *User) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.ParentsTable, user.ParentsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryLikedTweets queries the liked_tweets edge of a User.
 func (c *UserClient) QueryLikedTweets(_m *User) *TweetQuery {
 	query := (&TweetClient{config: c.config}).Query()
@@ -2839,6 +2996,38 @@ func (c *UserClient) QueryRelationship(_m *User) *RelationshipQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(relationship.Table, relationship.UserColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.RelationshipTable, user.RelationshipColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChildParentships queries the child_parentships edge of a User.
+func (c *UserClient) QueryChildParentships(_m *User) *ParentshipQuery {
+	query := (&ParentshipClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(parentship.Table, parentship.ParentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.ChildParentshipsTable, user.ChildParentshipsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParentParentships queries the parent_parentships edge of a User.
+func (c *UserClient) QueryParentParentships(_m *User) *ParentshipQuery {
+	query := (&ParentshipClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(parentship.Table, parentship.ChildColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.ParentParentshipsTable, user.ParentParentshipsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -3253,13 +3442,13 @@ func (c *UserTweetClient) mutate(ctx context.Context, m *UserTweetMutation) (Val
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AttachedFile, File, Friendship, Group, GroupTag, Process, Relationship,
-		RelationshipInfo, Role, RoleUser, Tag, Tweet, TweetLike, TweetTag, User,
-		UserGroup, UserTweet []ent.Hook
+		AttachedFile, File, Friendship, Group, GroupTag, Parentship, Process,
+		Relationship, RelationshipInfo, Role, RoleUser, Tag, Tweet, TweetLike,
+		TweetTag, User, UserGroup, UserTweet []ent.Hook
 	}
 	inters struct {
-		AttachedFile, File, Friendship, Group, GroupTag, Process, Relationship,
-		RelationshipInfo, Role, RoleUser, Tag, Tweet, TweetLike, TweetTag, User,
-		UserGroup, UserTweet []ent.Interceptor
+		AttachedFile, File, Friendship, Group, GroupTag, Parentship, Process,
+		Relationship, RelationshipInfo, Role, RoleUser, Tag, Tweet, TweetLike,
+		TweetTag, User, UserGroup, UserTweet []ent.Interceptor
 	}
 )
