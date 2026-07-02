@@ -703,11 +703,11 @@ func (t *Type) setupFKs() error {
 		if err := e.setStorageKey(); err != nil {
 			return fmt.Errorf("%q edge: %w", e.Name, err)
 		}
-		if ef := e.def.Field; ef != "" && !e.OwnFK() {
-			return fmt.Errorf("edge %q has a field %q but it is not holding a foreign key", e.Name, ef)
-		}
 		if e.IsInverse() || e.M2M() {
 			continue
+		}
+		if ef := e.def.Field; ef != "" && !e.OwnFK() {
+			return fmt.Errorf("edge %q has a field %q but it is not holding a foreign key", e.Name, ef)
 		}
 		owner, refid := t, e.Type.ID
 		if !e.OwnFK() {

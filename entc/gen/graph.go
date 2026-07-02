@@ -453,6 +453,12 @@ func (g *Graph) resolve(t *Type) error {
 				if c1 == c2 {
 					c2 = rules.Singularize(e.Name) + "_id"
 				}
+				if e.def.Field != "" {
+					c1 = e.def.Field
+				}
+				if ref.def.Field != "" {
+					c2 = ref.def.Field
+				}
 				// Share the same backing array for the relation columns so
 				// that any changes to one will be reflected in both edges.
 				e.Rel.Columns = []string{c1, c2}

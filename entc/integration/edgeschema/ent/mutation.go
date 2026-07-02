@@ -19,6 +19,7 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/friendship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/group"
 	"entgo.io/ent/entc/integration/edgeschema/ent/grouptag"
+	"entgo.io/ent/entc/integration/edgeschema/ent/parentship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/process"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationshipinfo"
@@ -48,6 +49,7 @@ const (
 	TypeFriendship       = "Friendship"
 	TypeGroup            = "Group"
 	TypeGroupTag         = "GroupTag"
+	TypeParentship       = "Parentship"
 	TypeProcess          = "Process"
 	TypeRelationship     = "Relationship"
 	TypeRelationshipInfo = "RelationshipInfo"
@@ -839,6 +841,57 @@ func (m *GroupTagMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldGroupID(ctx)
 	}
 	return nil, fmt.Errorf("unknown GroupTag field %s", name)
+}
+
+// ParentshipMutation represents an operation that mutates the Parentship nodes in the graph.
+type ParentshipMutation struct {
+	parentship.Mutation
+	config
+	done     bool
+	oldValue func(context.Context) (*Parentship, error)
+}
+
+var _ ent.Mutation = (*ParentshipMutation)(nil)
+
+// parentshipOption allows management of the mutation configuration using functional options.
+type parentshipOption func(*ParentshipMutation)
+
+// newParentshipMutation creates new mutation for the Parentship entity.
+func newParentshipMutation(c config, op Op, opts ...parentshipOption) *ParentshipMutation {
+	m := &ParentshipMutation{
+		Mutation: *parentship.NewMutation(op),
+		config:   c,
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ParentshipMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ParentshipMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ParentshipMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, errors.New("edge schema Parentship does not support getting old values")
 }
 
 // ProcessMutation represents an operation that mutates the Process nodes in the graph.

@@ -30,6 +30,12 @@ type Mutation struct {
 	relatives            map[int]struct{}
 	removedrelatives     map[int]struct{}
 	clearedrelatives     bool
+	children             map[int]struct{}
+	removedchildren      map[int]struct{}
+	clearedchildren      bool
+	parents              map[int]struct{}
+	removedparents       map[int]struct{}
+	clearedparents       bool
 	liked_tweets         map[int]struct{}
 	removedliked_tweets  map[int]struct{}
 	clearedliked_tweets  bool
@@ -244,6 +250,114 @@ func (m *Mutation) ResetRelatives() {
 	m.relatives = nil
 	m.clearedrelatives = false
 	m.removedrelatives = nil
+}
+
+// AddChildIDs adds the "children" edge to the User entity by ids.
+func (m *Mutation) AddChildIDs(ids ...int) {
+	if m.children == nil {
+		m.children = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.children[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChildren clears the "children" edge to the User entity.
+func (m *Mutation) ClearChildren() {
+	m.clearedchildren = true
+}
+
+// ChildrenCleared reports if the "children" edge to the User entity was cleared.
+func (m *Mutation) ChildrenCleared() bool {
+	return m.clearedchildren
+}
+
+// RemoveChildIDs removes the "children" edge to the User entity by IDs.
+func (m *Mutation) RemoveChildIDs(ids ...int) {
+	if m.removedchildren == nil {
+		m.removedchildren = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.children, ids[i])
+		m.removedchildren[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChildren returns the removed IDs of the "children" edge to the User entity.
+func (m *Mutation) RemovedChildrenIDs() (ids []int) {
+	for id := range m.removedchildren {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChildrenIDs returns the "children" edge IDs in the mutation.
+func (m *Mutation) ChildrenIDs() (ids []int) {
+	for id := range m.children {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChildren resets all changes to the "children" edge.
+func (m *Mutation) ResetChildren() {
+	m.children = nil
+	m.clearedchildren = false
+	m.removedchildren = nil
+}
+
+// AddParentIDs adds the "parents" edge to the User entity by ids.
+func (m *Mutation) AddParentIDs(ids ...int) {
+	if m.parents == nil {
+		m.parents = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.parents[ids[i]] = struct{}{}
+	}
+}
+
+// ClearParents clears the "parents" edge to the User entity.
+func (m *Mutation) ClearParents() {
+	m.clearedparents = true
+}
+
+// ParentsCleared reports if the "parents" edge to the User entity was cleared.
+func (m *Mutation) ParentsCleared() bool {
+	return m.clearedparents
+}
+
+// RemoveParentIDs removes the "parents" edge to the User entity by IDs.
+func (m *Mutation) RemoveParentIDs(ids ...int) {
+	if m.removedparents == nil {
+		m.removedparents = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.parents, ids[i])
+		m.removedparents[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedParents returns the removed IDs of the "parents" edge to the User entity.
+func (m *Mutation) RemovedParentsIDs() (ids []int) {
+	for id := range m.removedparents {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ParentsIDs returns the "parents" edge IDs in the mutation.
+func (m *Mutation) ParentsIDs() (ids []int) {
+	for id := range m.parents {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetParents resets all changes to the "parents" edge.
+func (m *Mutation) ResetParents() {
+	m.parents = nil
+	m.clearedparents = false
+	m.removedparents = nil
 }
 
 // AddLikedTweetIDs adds the "liked_tweets" edge to the Tweet entity by ids.
@@ -699,7 +813,7 @@ func (m *Mutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *Mutation) AddedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 11)
 	if m.groups != nil {
 		edges = append(edges, EdgeGroups)
 	}
@@ -708,6 +822,12 @@ func (m *Mutation) AddedEdges() []string {
 	}
 	if m.relatives != nil {
 		edges = append(edges, EdgeRelatives)
+	}
+	if m.children != nil {
+		edges = append(edges, EdgeChildren)
+	}
+	if m.parents != nil {
+		edges = append(edges, EdgeParents)
 	}
 	if m.liked_tweets != nil {
 		edges = append(edges, EdgeLikedTweets)
@@ -749,6 +869,18 @@ func (m *Mutation) AddedIDs(name string) []ent.Value {
 	case EdgeRelatives:
 		ids := make([]ent.Value, 0, len(m.relatives))
 		for id := range m.relatives {
+			ids = append(ids, id)
+		}
+		return ids
+	case EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.children))
+		for id := range m.children {
+			ids = append(ids, id)
+		}
+		return ids
+	case EdgeParents:
+		ids := make([]ent.Value, 0, len(m.parents))
+		for id := range m.parents {
 			ids = append(ids, id)
 		}
 		return ids
@@ -794,7 +926,7 @@ func (m *Mutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *Mutation) RemovedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 11)
 	if m.removedgroups != nil {
 		edges = append(edges, EdgeGroups)
 	}
@@ -803,6 +935,12 @@ func (m *Mutation) RemovedEdges() []string {
 	}
 	if m.removedrelatives != nil {
 		edges = append(edges, EdgeRelatives)
+	}
+	if m.removedchildren != nil {
+		edges = append(edges, EdgeChildren)
+	}
+	if m.removedparents != nil {
+		edges = append(edges, EdgeParents)
 	}
 	if m.removedliked_tweets != nil {
 		edges = append(edges, EdgeLikedTweets)
@@ -844,6 +982,18 @@ func (m *Mutation) RemovedIDs(name string) []ent.Value {
 	case EdgeRelatives:
 		ids := make([]ent.Value, 0, len(m.removedrelatives))
 		for id := range m.removedrelatives {
+			ids = append(ids, id)
+		}
+		return ids
+	case EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.removedchildren))
+		for id := range m.removedchildren {
+			ids = append(ids, id)
+		}
+		return ids
+	case EdgeParents:
+		ids := make([]ent.Value, 0, len(m.removedparents))
+		for id := range m.removedparents {
 			ids = append(ids, id)
 		}
 		return ids
@@ -889,7 +1039,7 @@ func (m *Mutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *Mutation) ClearedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 11)
 	if m.clearedgroups {
 		edges = append(edges, EdgeGroups)
 	}
@@ -898,6 +1048,12 @@ func (m *Mutation) ClearedEdges() []string {
 	}
 	if m.clearedrelatives {
 		edges = append(edges, EdgeRelatives)
+	}
+	if m.clearedchildren {
+		edges = append(edges, EdgeChildren)
+	}
+	if m.clearedparents {
+		edges = append(edges, EdgeParents)
 	}
 	if m.clearedliked_tweets {
 		edges = append(edges, EdgeLikedTweets)
@@ -930,6 +1086,10 @@ func (m *Mutation) EdgeCleared(name string) bool {
 		return m.clearedfriends
 	case EdgeRelatives:
 		return m.clearedrelatives
+	case EdgeChildren:
+		return m.clearedchildren
+	case EdgeParents:
+		return m.clearedparents
 	case EdgeLikedTweets:
 		return m.clearedliked_tweets
 	case EdgeTweets:
@@ -966,6 +1126,12 @@ func (m *Mutation) ResetEdge(name string) error {
 		return nil
 	case EdgeRelatives:
 		m.ResetRelatives()
+		return nil
+	case EdgeChildren:
+		m.ResetChildren()
+		return nil
+	case EdgeParents:
+		m.ResetParents()
 		return nil
 	case EdgeLikedTweets:
 		m.ResetLikedTweets()

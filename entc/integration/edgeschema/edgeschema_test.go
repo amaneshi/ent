@@ -17,6 +17,7 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/friendship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/group"
 	"entgo.io/ent/entc/integration/edgeschema/ent/migrate"
+	"entgo.io/ent/entc/integration/edgeschema/ent/parentship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationship"
 	"entgo.io/ent/entc/integration/edgeschema/ent/relationshipinfo"
 	_ "entgo.io/ent/entc/integration/edgeschema/ent/runtime"
@@ -285,6 +286,120 @@ func TestEdgeSchemaBidiCompositeID(t *testing.T) {
 	require.Equal(t, r1.UserID, r2.UserID)
 	require.Equal(t, r1.RelativeID, r2.RelativeID)
 	require.Equal(t, info.ID, r2.Edges.Info.ID)
+}
+
+func TestEdgeSchemaBidiAsymmetricCompositeID(t *testing.T) {
+	client, err := ent.Open(dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1")
+	require.NoError(t, err)
+	defer client.Close()
+	ctx := context.Background()
+	require.NoError(t, client.Schema.Create(ctx, migrate.WithGlobalUniqueID(true)))
+
+	// test child side
+	c1 := client.User.Create().SetName("c1").SaveX(ctx)
+	c2 := client.User.Create().SetName("c2").SaveX(ctx)
+	p1 := client.User.Create().SetName("p1").AddChildren(c1).SaveX(ctx)
+	p2 := client.User.Create().SetName("p2").AddChildren(c1, c2).SaveX(ctx)
+
+	err = p2.Update().AddChildren(c1).Exec(ctx)
+	require.True(t, ent.IsConstraintError(err), "duplicate edge error, because edge may contain a different 'weight' value in the database")
+	require.EqualError(t, errors.Unwrap(err), "add m2m edge for table parentships: UNIQUE constraint failed: parentships.parent_id, parentships.child_id")
+
+	p3p4 := client.User.CreateBulk(
+		client.User.Create().SetName("p3").AddChildren(c1, c2),
+		client.User.Create().SetName("p4").AddChildren(c1, c2),
+	).SaveX(ctx)
+	for _, p := range p3p4 {
+		require.Equal(t, 2, p.QueryChildren().CountX(ctx))
+		edges := p.QueryChildParentships().AllX(ctx)
+		require.Len(t, edges, 2)
+		require.NotZero(t, edges[0].Weight)
+		require.NotZero(t, edges[1].Weight)
+
+		err := p.Update().AddChildren(c2).Exec(ctx)
+		require.True(t, ent.IsConstraintError(err), "duplicate edge error, because edge may contain a different 'weight' value in the database")
+		require.EqualError(t, errors.Unwrap(err), "add m2m edge for table parentships: UNIQUE constraint failed: parentships.parent_id, parentships.child_id")
+
+		// Currently, the foreign-key action is configured as "NO ACTION" rather than "CASCADE", because
+		// we do not clear edge-schema records when nodes are deleted, as they are treated as real nodes
+		// (with additional fields) and not just as connections. Therefore, these we clear these edges
+		// before deleting the record to avoid getting constraint violation.
+		p.Update().ClearChildren().ExecX(ctx)
+		client.User.DeleteOne(p).ExecX(ctx)
+	}
+
+	type child struct {
+		ChildID int `sql:"child_id"`
+		Count   int `sql:"count"`
+	}
+	var cs []child
+	client.Parentship.Query().GroupBy(parentship.FieldChildID).Aggregate(ent.Count()).ScanX(ctx, &cs)
+	require.EqualValues(
+		t,
+		[]child{{c1.ID, 2}, {c2.ID, 1}},
+		cs,
+	)
+	for _, r := range []int{
+		p1.QueryChildParentships().Where(parentship.ChildID(c1.ID)).QueryChild().OnlyIDX(ctx),
+		p2.QueryChildren().QueryParentParentships().Where(parentship.ChildIDNEQ(c2.ID)).QueryChild().OnlyIDX(ctx),
+		client.User.Query().Where(user.ID(p1.ID)).QueryChildren().QueryParentParentships().Where(parentship.ChildIDNEQ(c2.ID)).QueryChild().OnlyIDX(ctx),
+	} {
+		require.Equal(t, c1.ID, r)
+	}
+	client.Parentship.Delete().ExecX(ctx)
+	client.User.Delete().ExecX(ctx)
+
+	// test parent side
+	p1 = client.User.Create().SetName("p1").SaveX(ctx)
+	p2 = client.User.Create().SetName("p2").SaveX(ctx)
+	c1 = client.User.Create().SetName("c1").AddParents(p1).SaveX(ctx)
+	c2 = client.User.Create().SetName("c2").AddParents(p1, p2).SaveX(ctx)
+
+	err = c2.Update().AddParents(p1).Exec(ctx)
+	require.True(t, ent.IsConstraintError(err), "duplicate edge error, because edge may contain a different 'weight' value in the database")
+	require.EqualError(t, errors.Unwrap(err), "add m2m edge for table parentships: UNIQUE constraint failed: parentships.parent_id, parentships.child_id")
+
+	c3c4 := client.User.CreateBulk(
+		client.User.Create().SetName("c3").AddParents(p1, p2),
+		client.User.Create().SetName("c4").AddParents(p1, p2),
+	).SaveX(ctx)
+	for _, c := range c3c4 {
+		require.Equal(t, 2, c.QueryParents().CountX(ctx))
+		edges := c.QueryParentParentships().AllX(ctx)
+		require.Len(t, edges, 2)
+		require.NotZero(t, edges[0].Weight)
+		require.NotZero(t, edges[1].Weight)
+
+		err := c.Update().AddParents(p2).Exec(ctx)
+		require.True(t, ent.IsConstraintError(err), "duplicate edge error, because edge may contain a different 'weight' value in the database")
+		require.EqualError(t, errors.Unwrap(err), "add m2m edge for table parentships: UNIQUE constraint failed: parentships.parent_id, parentships.child_id")
+
+		// Currently, the foreign-key action is configured as "NO ACTION" rather than "CASCADE", because
+		// we do not clear edge-schema records when nodes are deleted, as they are treated as real nodes
+		// (with additional fields) and not just as connections. Therefore, these we clear these edges
+		// before deleting the record to avoid getting constraint violation.
+		c.Update().ClearParents().ExecX(ctx)
+		client.User.DeleteOne(c).ExecX(ctx)
+	}
+
+	type parent struct {
+		ParentID int `sql:"parent_id"`
+		Count    int `sql:"count"`
+	}
+	var ps []parent
+	client.Parentship.Query().GroupBy(parentship.FieldParentID).Aggregate(ent.Count()).ScanX(ctx, &ps)
+	require.EqualValues(
+		t,
+		[]parent{{p1.ID, 2}, {p2.ID, 1}},
+		ps,
+	)
+	for _, r := range []int{
+		c1.QueryParentParentships().Where(parentship.ParentID(p1.ID)).QueryParent().OnlyIDX(ctx),
+		c2.QueryParents().QueryChildParentships().Where(parentship.ParentIDNEQ(p2.ID)).QueryParent().OnlyIDX(ctx),
+		client.User.Query().Where(user.ID(c1.ID)).QueryParents().QueryChildParentships().Where(parentship.ParentIDNEQ(p2.ID)).QueryParent().OnlyIDX(ctx),
+	} {
+		require.Equal(t, p1.ID, r)
+	}
 }
 
 func TestEdgeSchemaForO2M(t *testing.T) {

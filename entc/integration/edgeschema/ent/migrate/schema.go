@@ -141,6 +141,45 @@ var (
 			},
 		},
 	}
+	// ParentshipsColumns holds the columns for the "parentships" table.
+	ParentshipsColumns = []*schema.Column{
+		{Name: "weight", Type: field.TypeInt, Default: 1},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "parent_id", Type: field.TypeInt},
+		{Name: "child_id", Type: field.TypeInt},
+	}
+	// ParentshipsTable holds the schema information for the "parentships" table.
+	ParentshipsTable = &schema.Table{
+		Name:       "parentships",
+		Columns:    ParentshipsColumns,
+		PrimaryKey: []*schema.Column{ParentshipsColumns[3], ParentshipsColumns[2]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "parentships_users_parent",
+				Columns:    []*schema.Column{ParentshipsColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "parentships_users_child",
+				Columns:    []*schema.Column{ParentshipsColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "parentship_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ParentshipsColumns[1]},
+			},
+			{
+				Name:    "parentships_edge",
+				Unique:  true,
+				Columns: []*schema.Column{ParentshipsColumns[2], ParentshipsColumns[3]},
+			},
+		},
+	}
 	// ProcessesColumns holds the columns for the "processes" table.
 	ProcessesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -418,6 +457,7 @@ var (
 		FriendshipsTable,
 		GroupsTable,
 		GroupTagsTable,
+		ParentshipsTable,
 		ProcessesTable,
 		RelationshipsTable,
 		RelationshipInfosTable,
@@ -440,6 +480,8 @@ func init() {
 	FriendshipsTable.ForeignKeys[1].RefTable = UsersTable
 	GroupTagsTable.ForeignKeys[0].RefTable = TagsTable
 	GroupTagsTable.ForeignKeys[1].RefTable = GroupsTable
+	ParentshipsTable.ForeignKeys[0].RefTable = UsersTable
+	ParentshipsTable.ForeignKeys[1].RefTable = UsersTable
 	RelationshipsTable.ForeignKeys[0].RefTable = UsersTable
 	RelationshipsTable.ForeignKeys[1].RefTable = UsersTable
 	RelationshipsTable.ForeignKeys[2].RefTable = RelationshipInfosTable

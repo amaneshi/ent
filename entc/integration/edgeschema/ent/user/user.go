@@ -25,6 +25,10 @@ const (
 	EdgeFriends = "friends"
 	// EdgeRelatives holds the string denoting the relatives edge name in mutations.
 	EdgeRelatives = "relatives"
+	// EdgeChildren holds the string denoting the children edge name in mutations.
+	EdgeChildren = "children"
+	// EdgeParents holds the string denoting the parents edge name in mutations.
+	EdgeParents = "parents"
 	// EdgeLikedTweets holds the string denoting the liked_tweets edge name in mutations.
 	EdgeLikedTweets = "liked_tweets"
 	// EdgeTweets holds the string denoting the tweets edge name in mutations.
@@ -37,6 +41,10 @@ const (
 	EdgeFriendships = "friendships"
 	// EdgeRelationship holds the string denoting the relationship edge name in mutations.
 	EdgeRelationship = "relationship"
+	// EdgeChildParentships holds the string denoting the child_parentships edge name in mutations.
+	EdgeChildParentships = "child_parentships"
+	// EdgeParentParentships holds the string denoting the parent_parentships edge name in mutations.
+	EdgeParentParentships = "parent_parentships"
 	// EdgeLikes holds the string denoting the likes edge name in mutations.
 	EdgeLikes = "likes"
 	// EdgeUserTweets holds the string denoting the user_tweets edge name in mutations.
@@ -54,6 +62,10 @@ const (
 	FriendsTable = "friendships"
 	// RelativesTable is the table that holds the relatives relation/edge. The primary key declared below.
 	RelativesTable = "relationships"
+	// ChildrenTable is the table that holds the children relation/edge. The primary key declared below.
+	ChildrenTable = "parentships"
+	// ParentsTable is the table that holds the parents relation/edge. The primary key declared below.
+	ParentsTable = "parentships"
 	// LikedTweetsTable is the table that holds the liked_tweets relation/edge. The primary key declared below.
 	LikedTweetsTable = "tweet_likes"
 	// LikedTweetsInverseTable is the table name for the Tweet entity.
@@ -90,6 +102,20 @@ const (
 	RelationshipInverseTable = "relationships"
 	// RelationshipColumn is the table column denoting the relationship relation/edge.
 	RelationshipColumn = "user_id"
+	// ChildParentshipsTable is the table that holds the child_parentships relation/edge.
+	ChildParentshipsTable = "parentships"
+	// ChildParentshipsInverseTable is the table name for the Parentship entity.
+	// It exists in this package in order to avoid circular dependency with the "parentship" package.
+	ChildParentshipsInverseTable = "parentships"
+	// ChildParentshipsColumn is the table column denoting the child_parentships relation/edge.
+	ChildParentshipsColumn = "parent_id"
+	// ParentParentshipsTable is the table that holds the parent_parentships relation/edge.
+	ParentParentshipsTable = "parentships"
+	// ParentParentshipsInverseTable is the table name for the Parentship entity.
+	// It exists in this package in order to avoid circular dependency with the "parentship" package.
+	ParentParentshipsInverseTable = "parentships"
+	// ParentParentshipsColumn is the table column denoting the parent_parentships relation/edge.
+	ParentParentshipsColumn = "child_id"
 	// LikesTable is the table that holds the likes relation/edge.
 	LikesTable = "tweet_likes"
 	// LikesInverseTable is the table name for the TweetLike entity.
@@ -129,6 +155,12 @@ var (
 	// RelativesPrimaryKey and RelativesColumn2 are the table columns denoting the
 	// primary key for the relatives relation (M2M).
 	RelativesPrimaryKey = []string{"user_id", "relative_id"}
+	// ChildrenPrimaryKey and ChildrenColumn2 are the table columns denoting the
+	// primary key for the children relation (M2M).
+	ChildrenPrimaryKey = []string{"child_id", "parent_id"}
+	// ParentsPrimaryKey and ParentsColumn2 are the table columns denoting the
+	// primary key for the parents relation (M2M).
+	ParentsPrimaryKey = []string{"child_id", "parent_id"}
 	// LikedTweetsPrimaryKey and LikedTweetsColumn2 are the table columns denoting the
 	// primary key for the liked_tweets relation (M2M).
 	LikedTweetsPrimaryKey = []string{"user_id", "tweet_id"}
@@ -217,6 +249,34 @@ func ByRelatives(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByChildrenCount orders the results by children count.
+func ByChildrenCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newChildrenStep(), opts...)
+	}
+}
+
+// ByChildren orders the results by children terms.
+func ByChildren(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newChildrenStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByParentsCount orders the results by parents count.
+func ByParentsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newParentsStep(), opts...)
+	}
+}
+
+// ByParents orders the results by parents terms.
+func ByParents(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newParentsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByLikedTweetsCount orders the results by liked_tweets count.
 func ByLikedTweetsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -301,6 +361,34 @@ func ByRelationship(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByChildParentshipsCount orders the results by child_parentships count.
+func ByChildParentshipsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newChildParentshipsStep(), opts...)
+	}
+}
+
+// ByChildParentships orders the results by child_parentships terms.
+func ByChildParentships(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newChildParentshipsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByParentParentshipsCount orders the results by parent_parentships count.
+func ByParentParentshipsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newParentParentshipsStep(), opts...)
+	}
+}
+
+// ByParentParentships orders the results by parent_parentships terms.
+func ByParentParentships(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newParentParentshipsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByLikesCount orders the results by likes count.
 func ByLikesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -363,6 +451,20 @@ func newRelativesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, RelativesTable, RelativesPrimaryKey...),
 	)
 }
+func newChildrenStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ChildrenTable, ChildrenPrimaryKey...),
+	)
+}
+func newParentsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, ParentsTable, ParentsPrimaryKey...),
+	)
+}
 func newLikedTweetsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -403,6 +505,20 @@ func newRelationshipStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RelationshipInverseTable, RelationshipColumn),
 		sqlgraph.Edge(sqlgraph.O2M, true, RelationshipTable, RelationshipColumn),
+	)
+}
+func newChildParentshipsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ChildParentshipsInverseTable, ChildParentshipsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, ChildParentshipsTable, ChildParentshipsColumn),
+	)
+}
+func newParentParentshipsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ParentParentshipsInverseTable, ParentParentshipsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, ParentParentshipsTable, ParentParentshipsColumn),
 	)
 }
 func newLikesStep() *sqlgraph.Step {

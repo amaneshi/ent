@@ -25,6 +25,9 @@ type Group func(*sql.Selector)
 // GroupTag is the predicate function for grouptag builders.
 type GroupTag func(*sql.Selector)
 
+// Parentship is the predicate function for parentship builders.
+type Parentship func(*sql.Selector)
+
 // Process is the predicate function for process builders.
 type Process func(*sql.Selector)
 
