@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+	"uuid"
 
 	"entgo.io/ent/schema"
 )
@@ -1224,13 +1225,9 @@ func (b *uuidBuilder) StructTag(s string) *uuidBuilder {
 // of the field on creation. Codegen fails if the default function
 // doesn't return the same concrete that was set for the UUID type.
 //
-//	field.UUID("id", uuid.UUID{}).
+//	field.UUID("id").
 //		Default(uuid.New)
 func (b *uuidBuilder) Default(fn any) *uuidBuilder {
-	typ := reflect.TypeOf(fn)
-	if typ.Kind() != reflect.Func || typ.NumIn() != 0 || typ.NumOut() != 1 || typ.Out(0).String() != b.desc.Info.String() {
-		b.desc.Err = fmt.Errorf("expect type (func() %s) for uuid default value", b.desc.Info)
-	}
 	b.desc.Default = fn
 	return b
 }
@@ -1238,7 +1235,7 @@ func (b *uuidBuilder) Default(fn any) *uuidBuilder {
 // SchemaType overrides the default database type with a custom
 // schema type (per dialect) for uuid.
 //
-//	field.UUID("id", uuid.New()).
+//	field.UUID("id").
 //		SchemaType(map[string]string{
 //			dialect.Postgres: "CustomUUID",
 //		})
@@ -1250,7 +1247,7 @@ func (b *uuidBuilder) SchemaType(types map[string]string) *uuidBuilder {
 // Annotations adds a list of annotations to the field object to be used by
 // codegen extensions.
 //
-//	field.UUID("id", uuid.New()).
+//	field.UUID("id").
 //		Annotations(
 //			entgql.OrderField("ID"),
 //		)
@@ -1272,7 +1269,10 @@ func (b *uuidBuilder) Deprecated(reason ...string) *uuidBuilder {
 
 // Descriptor implements the ent.Field interface by returning its descriptor.
 func (b *uuidBuilder) Descriptor() *Descriptor {
-	b.desc.checkGoType(valueScannerType)
+	if b.desc.Default != nil {
+		b.desc.checkDefaultFunc(uuidType)
+	}
+	b.desc.checkGoType(uuidType)
 	return b.desc
 }
 
@@ -1552,6 +1552,7 @@ var (
 	bytesType        = reflect.TypeOf([]byte(nil))
 	timeType         = reflect.TypeOf(time.Time{})
 	stringType       = reflect.TypeOf("")
+	uuidType         = reflect.TypeOf(uuid.UUID{})
 	valueType        = reflect.TypeOf((*driver.Value)(nil)).Elem()
 	valuerType       = reflect.TypeOf((*driver.Valuer)(nil)).Elem()
 	errorType        = reflect.TypeOf((*error)(nil)).Elem()

@@ -70,7 +70,7 @@ func ({{ $receiver }} *{{ $.Name }}) assignValues(columns []string, values []any
 		switch columns[i] {
 		{{- if $.HasOneFieldID }}
 			case {{ $.Package }}.{{ $.ID.Constant }}:
-				{{- if or $.ID.IsString $.ID.IsBytes $.ID.HasGoType $.ID.HasValueScanner }}
+				{{- if or $.ID.IsString $.ID.IsBytes $.ID.IsUUID $.ID.HasGoType $.ID.HasValueScanner }}
 					{{- with extend $ "Idx" "i" "Field" $.ID "Rec" $receiver }}
 						{{ template "dialect/sql/decode/field" . }}
 					{{- end }}
