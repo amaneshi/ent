@@ -161,7 +161,7 @@ var (
 		TypeBool:    "bool",
 		TypeTime:    "time.Time",
 		TypeJSON:    "json.RawMessage",
-		TypeUUID:    "[16]byte",
+		TypeUUID:    "uuid.UUID",
 		TypeBytes:   "[]byte",
 		TypeEnum:    "string",
 		TypeString:  "string",
