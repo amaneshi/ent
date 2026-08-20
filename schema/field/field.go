@@ -149,18 +149,11 @@ func Enum(name string) *enumBuilder {
 // UUID returns a new Field with type UUID. An example for defining UUID field is as follows:
 //
 //	field.UUID("id", uuid.New())
-func UUID(name string, typ any) *uuidBuilder {
-	rt := reflect.TypeOf(typ)
-	b := &uuidBuilder{&Descriptor{
+func UUID(name string) *uuidBuilder {
+	return &uuidBuilder{&Descriptor{
 		Name: name,
-		Info: &TypeInfo{
-			Type:    TypeUUID,
-			Ident:   rt.String(),
-			PkgPath: indirect(rt).PkgPath(),
-		},
+		Info: &TypeInfo{Type: TypeUUID, PkgPath: "uuid"},
 	}}
-	b.desc.goType(typ)
-	return b
 }
 
 // Other represents a field that is not a good fit for any of the standard field types.
