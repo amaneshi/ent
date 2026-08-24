@@ -33,9 +33,9 @@ func (*UserAuditLog) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case userauditlog.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case userauditlog.FieldOperationType, userauditlog.FieldOperationTime, userauditlog.FieldOldValue, userauditlog.FieldNewValue:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -52,34 +52,34 @@ func (_m *UserAuditLog) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case userauditlog.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case userauditlog.FieldOperationType:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field operation_type", values[i])
 			} else if value.Valid {
-				_m.OperationType = value.String
+				_m.OperationType = string(value.V)
 			}
 		case userauditlog.FieldOperationTime:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field operation_time", values[i])
 			} else if value.Valid {
-				_m.OperationTime = value.String
+				_m.OperationTime = string(value.V)
 			}
 		case userauditlog.FieldOldValue:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field old_value", values[i])
 			} else if value.Valid {
-				_m.OldValue = value.String
+				_m.OldValue = string(value.V)
 			}
 		case userauditlog.FieldNewValue:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field new_value", values[i])
 			} else if value.Valid {
-				_m.NewValue = value.String
+				_m.NewValue = string(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

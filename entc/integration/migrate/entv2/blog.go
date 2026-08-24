@@ -52,7 +52,7 @@ func (*Blog) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case blog.FieldID, blog.FieldOid:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -69,16 +69,16 @@ func (_m *Blog) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case blog.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case blog.FieldOid:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field oid", values[i])
 			} else if value.Valid {
-				_m.Oid = int(value.Int64)
+				_m.Oid = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

@@ -11,6 +11,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"math"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -19,7 +20,6 @@ import (
 	"entgo.io/ent/entc/integration/customid/ent/bloblink"
 	"entgo.io/ent/entc/integration/customid/ent/predicate"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // BlobQuery is the builder for querying Blob entities.
@@ -565,11 +565,11 @@ func (_q *BlobQuery) loadLinks(ctx context.Context, query *BlobQuery, nodes []*B
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(uuid.UUID)}, values...), nil
+				return append([]any{new(sql.Null[uuid.UUID])}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := *values[0].(*uuid.UUID)
-				inValue := *values[1].(*uuid.UUID)
+				outValue := uuid.UUID(values[0].(*sql.Null[uuid.UUID]).V)
+				inValue := uuid.UUID(values[1].(*sql.Null[uuid.UUID]).V)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Blob]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

@@ -682,7 +682,7 @@ type BigInt struct {
 }
 
 func (b *BigInt) Scan(src any) error {
-	var i sql.NullString
+	var i sql.Null[string]
 	if err := i.Scan(src); err != nil {
 		return err
 	}

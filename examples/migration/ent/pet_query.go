@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -18,7 +19,6 @@ import (
 	"entgo.io/ent/examples/migration/ent/predicate"
 	"entgo.io/ent/examples/migration/ent/user"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // PetQuery is the builder for querying Pet entities.

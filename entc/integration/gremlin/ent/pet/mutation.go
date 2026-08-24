@@ -10,11 +10,11 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/gremlin/graph/dsl"
 	"entgo.io/ent/entc/integration/gremlin/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // Mutation represents an operation that mutates the Pet nodes in the graph.

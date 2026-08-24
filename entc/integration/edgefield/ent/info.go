@@ -8,6 +8,7 @@ package ent
 
 import (
 	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 
@@ -23,7 +24,7 @@ type Info struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Content holds the value of the "content" field.
-	Content json.RawMessage `json:"content,omitempty"`
+	Content jsontext.Value `json:"content,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the InfoQuery when eager-loading is set.
 	Edges        InfoEdges `json:"edges"`
@@ -58,7 +59,7 @@ func (*Info) scanValues(columns []string) ([]any, error) {
 		case info.FieldContent:
 			values[i] = new([]byte)
 		case info.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -75,11 +76,11 @@ func (_m *Info) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case info.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case info.FieldContent:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field content", values[i])

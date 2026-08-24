@@ -9,11 +9,11 @@ package tweet
 import (
 	"context"
 	"fmt"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/edgeschema/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // Mutation represents an operation that mutates the Tweet nodes in the graph.

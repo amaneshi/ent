@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"testing"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/ent"
@@ -21,7 +22,6 @@ import (
 	"entgo.io/ent/entc/integration/ent/schema/task"
 	enttask "entgo.io/ent/entc/integration/ent/task"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -69,7 +69,7 @@ func Types(t *testing.T, client *ent.Client) {
 		SetNillableInt64(math.MinInt64).
 		SetDir("dir").
 		SetNdir("ndir").
-		SetNullStr(&sql.NullString{String: "not-default", Valid: true}).
+		SetNullStr(&sql.Null[string]{V: "not-default", Valid: true}).
 		SetLink(schema.Link{URL: link}).
 		SetLinkOther(&schema.Link{URL: link}).
 		SetNullLink(&schema.Link{URL: link}).
@@ -95,8 +95,8 @@ func Types(t *testing.T, client *ent.Client) {
 	require.Equal(http.Dir("dir"), ft.Dir)
 	require.NotNil(*ft.Ndir)
 	require.Equal(http.Dir("ndir"), *ft.Ndir)
-	require.Equal("default", ft.Str.String)
-	require.Equal("not-default", ft.NullStr.String)
+	require.Equal("default", ft.Str.V)
+	require.Equal("not-default", ft.NullStr.V)
 	require.Equal("localhost", ft.Link.String())
 	require.Equal("localhost", ft.LinkOther.String())
 	require.Equal("localhost", ft.NullLink.String())
@@ -118,7 +118,7 @@ func Types(t *testing.T, client *ent.Client) {
 	require.NoError(err)
 	require.False(exists)
 	require.Equal("127.0.0.1", ft.LinkOtherFunc.String())
-	require.False(ft.DeletedAt.Time.IsZero())
+	require.False(ft.DeletedAt.V.IsZero())
 
 	ft = client.FieldType.UpdateOne(ft).AddOptionalUint64(10).SaveX(ctx)
 	require.EqualValues(10, ft.OptionalUint64)
@@ -162,8 +162,8 @@ func Types(t *testing.T, client *ent.Client) {
 		SetDecimal(10.20).
 		SetDir("dir").
 		SetNdir("ndir").
-		SetStr(sql.NullString{String: "str", Valid: true}).
-		SetNullStr(&sql.NullString{String: "str", Valid: true}).
+		SetStr(sql.Null[string]{V: "str", Valid: true}).
+		SetNullStr(&sql.Null[string]{V: "str", Valid: true}).
 		SetLink(schema.Link{URL: link}).
 		SetNullLink(&schema.Link{URL: link}).
 		SetLinkOther(&schema.Link{URL: link}).
@@ -190,8 +190,8 @@ func Types(t *testing.T, client *ent.Client) {
 	require.Equal(http.Dir("dir"), ft.Dir)
 	require.NotNil(*ft.Ndir)
 	require.Equal(http.Dir("ndir"), *ft.Ndir)
-	require.Equal("str", ft.Str.String)
-	require.Equal("str", ft.NullStr.String)
+	require.Equal("str", ft.Str.V)
+	require.Equal("str", ft.NullStr.V)
 	require.Equal("localhost", ft.Link.String())
 	require.Equal("localhost", ft.LinkOther.String())
 	require.Equal("localhost", ft.NullLink.String())
@@ -207,7 +207,7 @@ func Types(t *testing.T, client *ent.Client) {
 	require.Equal("2000", ft.BigInt.String())
 	require.EqualValues(100, ft.Int64, "UpdateDefault sets the value to 100")
 	require.EqualValues(100, ft.Duration, "UpdateDefault sets the value to 100ns")
-	require.False(ft.DeletedAt.Time.IsZero())
+	require.False(ft.DeletedAt.V.IsZero())
 
 	err = client.Task.CreateBulk(
 		client.Task.Create().SetPriority(task.PriorityLow),

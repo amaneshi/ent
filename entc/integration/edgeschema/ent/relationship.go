@@ -86,7 +86,7 @@ func (*Relationship) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case relationship.FieldWeight, relationship.FieldUserID, relationship.FieldRelativeID, relationship.FieldInfoID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -103,28 +103,28 @@ func (_m *Relationship) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case relationship.FieldWeight:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field weight", values[i])
 			} else if value.Valid {
-				_m.Weight = int(value.Int64)
+				_m.Weight = int(value.V)
 			}
 		case relationship.FieldUserID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.UserID = int(value.Int64)
+				_m.UserID = int(value.V)
 			}
 		case relationship.FieldRelativeID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field relative_id", values[i])
 			} else if value.Valid {
-				_m.RelativeID = int(value.Int64)
+				_m.RelativeID = int(value.V)
 			}
 		case relationship.FieldInfoID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field info_id", values[i])
 			} else if value.Valid {
-				_m.InfoID = int(value.Int64)
+				_m.InfoID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

@@ -446,7 +446,7 @@ func isNil(v any) bool {
 	switch rv.Kind() {
 	case reflect.Invalid:
 		return true
-	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Pointer, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
 		return rv.IsNil()
 	default:
 		return false
@@ -455,7 +455,7 @@ func isNil(v any) bool {
 
 // indirect returns the item at the end of indirection.
 func indirect(v reflect.Value) reflect.Value {
-	for ; v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface; v = v.Elem() {
+	for ; v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface; v = v.Elem() {
 	}
 	return v
 }
@@ -492,7 +492,7 @@ func dict(v ...any) map[string]any {
 			dict[key] = ""
 			continue
 		}
-		dict[key] = v[i+1]
+		dict[key] = v[i+1] //nolint:gosec // False positive
 	}
 	return dict
 }

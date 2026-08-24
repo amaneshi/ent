@@ -483,11 +483,11 @@ func (_q *RoleQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Ro
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
+				return append([]any{new(sql.Null[int64])}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
+				outValue := int(values[0].(*sql.Null[int64]).V)
+				inValue := int(values[1].(*sql.Null[int64]).V)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Role]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

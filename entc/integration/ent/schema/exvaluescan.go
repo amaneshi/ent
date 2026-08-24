@@ -44,15 +44,15 @@ func (ExValueScan) Fields() []ent.Field {
 			GoType(&big.Int{}).
 			ValueScanner(field.TextValueScanner[*big.Int]{}),
 		field.String("base64").
-			ValueScanner(field.ValueScannerFunc[string, *sql.NullString]{
+			ValueScanner(field.ValueScannerFunc[string, *sql.Null[string]]{
 				V: func(s string) (driver.Value, error) {
 					return base64.StdEncoding.EncodeToString([]byte(s)), nil
 				},
-				S: func(ns *sql.NullString) (string, error) {
+				S: func(ns *sql.Null[string]) (string, error) {
 					if !ns.Valid {
 						return "", nil
 					}
-					b, err := base64.StdEncoding.DecodeString(ns.String)
+					b, err := base64.StdEncoding.DecodeString(ns.V)
 					if err != nil {
 						return "", err
 					}
@@ -83,19 +83,19 @@ func (p PrefixedHex) Value(s string) (driver.Value, error) {
 
 // ScanValue implements the TypeValueScanner.ScanValue method.
 func (PrefixedHex) ScanValue() field.ValueScanner {
-	return &sql.NullString{}
+	return &sql.Null[string]{}
 }
 
 // FromValue implements the TypeValueScanner.FromValue method.
 func (p PrefixedHex) FromValue(v driver.Value) (string, error) {
-	s, ok := v.(*sql.NullString)
+	s, ok := v.(*sql.Null[string])
 	if !ok {
 		return "", fmt.Errorf("unexpected input for FromValue: %T", v)
 	}
 	if !s.Valid {
 		return "", nil
 	}
-	d, err := hex.DecodeString(strings.TrimPrefix(s.String, p.prefix+":"))
+	d, err := hex.DecodeString(strings.TrimPrefix(s.V, p.prefix+":"))
 	if err != nil {
 		return "", err
 	}

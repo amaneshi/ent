@@ -516,7 +516,7 @@ func safePolicy(schema interface{ Policy() ent.Policy }) (policy ent.Policy, err
 }
 
 func indirect(t reflect.Type) reflect.Type {
-	for t.Kind() == reflect.Ptr {
+	for t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
 	return t

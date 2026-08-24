@@ -13,6 +13,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"slices"
 	"sort"
 
 	"entgo.io/ent/dialect"
@@ -1290,16 +1291,16 @@ func (u *updater) updateTable(ctx context.Context, stmt *sql.UpdateBuilder) (int
 }
 
 func (u *updater) setExternalEdges(ctx context.Context, ids []driver.Value, addEdges, clearEdges map[Rel][]*EdgeSpec) error {
-	if err := u.graph.clearM2MEdges(ctx, ids, clearEdges[M2M]); err != nil {
+	if err := u.clearM2MEdges(ctx, ids, clearEdges[M2M]); err != nil {
 		return err
 	}
-	if err := u.graph.addM2MEdges(ctx, ids, addEdges[M2M]); err != nil {
+	if err := u.addM2MEdges(ctx, ids, addEdges[M2M]); err != nil {
 		return err
 	}
-	if err := u.graph.clearFKEdges(ctx, ids, append(clearEdges[O2M], clearEdges[O2O]...)); err != nil {
+	if err := u.clearFKEdges(ctx, ids, append(clearEdges[O2M], clearEdges[O2O]...)); err != nil {
 		return err
 	}
-	if err := u.graph.addFKEdges(ctx, ids, append(addEdges[O2M], addEdges[O2O]...)); err != nil {
+	if err := u.addFKEdges(ctx, ids, append(addEdges[O2M], addEdges[O2O]...)); err != nil {
 		return err
 	}
 	return nil
@@ -1426,10 +1427,10 @@ func (c *creator) node(ctx context.Context, drv dialect.Driver) error {
 		if err := c.insert(ctx, insert); err != nil {
 			return err
 		}
-		if err := c.graph.addM2MEdges(ctx, []driver.Value{c.ID.Value}, edges[M2M]); err != nil {
+		if err := c.addM2MEdges(ctx, []driver.Value{c.ID.Value}, edges[M2M]); err != nil {
 			return err
 		}
-		return c.graph.addFKEdges(ctx, []driver.Value{c.ID.Value}, append(edges[O2M], edges[O2O]...))
+		return c.addFKEdges(ctx, []driver.Value{c.ID.Value}, append(edges[O2M], edges[O2O]...))
 	}(); err != nil {
 		return rollback(tx, err)
 	}
@@ -1465,7 +1466,7 @@ func (c *creator) insert(ctx context.Context, insert *sql.InsertBuilder) error {
 		insert.Set(c.ID.Column, c.ID.Value)
 		// In case of "ON CONFLICT", the record may exist in the
 		// database, and we need to get back the database id field.
-		if len(c.CreateSpec.OnConflict) == 0 {
+		if len(c.OnConflict) == 0 {
 			query, args, err := insert.QueryErr()
 			if err != nil {
 				return err
@@ -1478,7 +1479,7 @@ func (c *creator) insert(ctx context.Context, insert *sql.InsertBuilder) error {
 
 // ensureConflict ensures the ON CONFLICT is added to the insert statement.
 func (c *creator) ensureConflict(insert *sql.InsertBuilder) {
-	if opts := c.CreateSpec.OnConflict; len(opts) > 0 {
+	if opts := c.OnConflict; len(opts) > 0 {
 		insert.OnConflict(opts...)
 		c.ensureLastInsertID(insert)
 	}
@@ -1491,10 +1492,8 @@ func (c *creator) ensureLastInsertID(insert *sql.InsertBuilder) {
 		return
 	}
 	insert.OnConflict(sql.ResolveWith(func(s *sql.UpdateSet) {
-		for _, column := range s.UpdateColumns() {
-			if column == c.ID.Column {
-				return
-			}
+		if slices.Contains(s.UpdateColumns(), c.ID.Column) {
+			return
 		}
 		s.Set(c.ID.Column, sql.Expr(fmt.Sprintf("LAST_INSERT_ID(%s)", s.Table().C(c.ID.Column))))
 	}))
@@ -1575,7 +1574,7 @@ func (c *batchCreator) nodes(ctx context.Context, drv dialect.Driver) error {
 		// statement), because we rely on RowsAffected to check if the FK column is NULL.
 		for _, node := range c.Nodes {
 			edges := EdgeSpecs(node.Edges).GroupRel()
-			if err := c.graph.addFKEdges(ctx, []driver.Value{node.ID.Value}, append(edges[O2M], edges[O2O]...)); err != nil {
+			if err := c.addFKEdges(ctx, []driver.Value{node.ID.Value}, append(edges[O2M], edges[O2O]...)); err != nil {
 				return err
 			}
 		}
@@ -1589,10 +1588,8 @@ func (c *batchCreator) nodes(ctx context.Context, drv dialect.Driver) error {
 // mayTx opens a new transaction if the create operation spans across multiple statements.
 func (c *batchCreator) mayTx(ctx context.Context, drv dialect.Driver) (dialect.Tx, error) {
 	for _, node := range c.Nodes {
-		for _, edge := range node.Edges {
-			if isExternalEdge(edge) {
-				return drv.Tx(ctx)
-			}
+		if slices.ContainsFunc(node.Edges, isExternalEdge) {
+			return drv.Tx(ctx)
 		}
 	}
 	return dialect.NopTx(drv), nil
@@ -1606,7 +1603,7 @@ func (c *batchCreator) batchInsert(ctx context.Context, tx dialect.ExecQuerier, 
 
 // ensureConflict ensures the ON CONFLICT is added to the insert statement.
 func (c *batchCreator) ensureConflict(insert *sql.InsertBuilder) {
-	if opts := c.BatchCreateSpec.OnConflict; len(opts) > 0 {
+	if opts := c.OnConflict; len(opts) > 0 {
 		insert.OnConflict(opts...)
 	}
 }

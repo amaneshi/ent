@@ -72,9 +72,9 @@ func (*Parent) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case parent.FieldByAdoption:
-			values[i] = new(sql.NullBool)
+			values[i] = new(sql.Null[bool])
 		case parent.FieldID, parent.FieldUserID, parent.FieldParentID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -91,28 +91,28 @@ func (_m *Parent) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case parent.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case parent.FieldByAdoption:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*sql.Null[bool]); !ok {
 				return fmt.Errorf("unexpected type %T for field by_adoption", values[i])
 			} else if value.Valid {
-				_m.ByAdoption = value.Bool
+				_m.ByAdoption = bool(value.V)
 			}
 		case parent.FieldUserID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.UserID = int(value.Int64)
+				_m.UserID = int(value.V)
 			}
 		case parent.FieldParentID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
 			} else if value.Valid {
-				_m.ParentID = int(value.Int64)
+				_m.ParentID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

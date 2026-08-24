@@ -60,13 +60,13 @@ func (*Car) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case car.FieldBeforeID, car.FieldAfterID:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.Null[float64])
 		case car.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case car.FieldModel:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case car.ForeignKeys[0]: // pet_cars
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -83,35 +83,35 @@ func (_m *Car) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case car.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case car.FieldBeforeID:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.Null[float64]); !ok {
 				return fmt.Errorf("unexpected type %T for field before_id", values[i])
 			} else if value.Valid {
-				_m.BeforeID = value.Float64
+				_m.BeforeID = float64(value.V)
 			}
 		case car.FieldAfterID:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.Null[float64]); !ok {
 				return fmt.Errorf("unexpected type %T for field after_id", values[i])
 			} else if value.Valid {
-				_m.AfterID = value.Float64
+				_m.AfterID = float64(value.V)
 			}
 		case car.FieldModel:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field model", values[i])
 			} else if value.Valid {
-				_m.Model = value.String
+				_m.Model = string(value.V)
 			}
 		case car.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field pet_cars", values[i])
 			} else if value.Valid {
 				_m.pet_cars = new(string)
-				*_m.pet_cars = value.String
+				*_m.pet_cars = string(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

@@ -711,13 +711,13 @@ func (f *BlobFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *BlobFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql uuid.UUID predicate on the id field.
+func (f *BlobFilter) WhereID(p entql.UuidP) {
 	f.Where(p.Field(blob.FieldID))
 }
 
-// WhereUUID applies the entql [16]byte predicate on the uuid field.
-func (f *BlobFilter) WhereUUID(p entql.ValueP) {
+// WhereUUID applies the entql uuid.UUID predicate on the uuid field.
+func (f *BlobFilter) WhereUUID(p entql.UuidP) {
 	f.Where(p.Field(blob.FieldUUID))
 }
 
@@ -808,13 +808,13 @@ func (f *BlobLinkFilter) WhereCreatedAt(p entql.TimeP) {
 	f.Where(p.Field(bloblink.FieldCreatedAt))
 }
 
-// WhereBlobID applies the entql [16]byte predicate on the blob_id field.
-func (f *BlobLinkFilter) WhereBlobID(p entql.ValueP) {
+// WhereBlobID applies the entql uuid.UUID predicate on the blob_id field.
+func (f *BlobLinkFilter) WhereBlobID(p entql.UuidP) {
 	f.Where(p.Field(bloblink.FieldBlobID))
 }
 
-// WhereLinkID applies the entql [16]byte predicate on the link_id field.
-func (f *BlobLinkFilter) WhereLinkID(p entql.ValueP) {
+// WhereLinkID applies the entql uuid.UUID predicate on the link_id field.
+func (f *BlobLinkFilter) WhereLinkID(p entql.UuidP) {
 	f.Where(p.Field(bloblink.FieldLinkID))
 }
 
@@ -1227,8 +1227,8 @@ func (f *LinkFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *LinkFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql uuid.UUID predicate on the id field.
+func (f *LinkFilter) WhereID(p entql.UuidP) {
 	f.Where(p.Field(link.FieldID))
 }
 
@@ -1272,8 +1272,8 @@ func (f *MixinIDFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *MixinIDFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql uuid.UUID predicate on the id field.
+func (f *MixinIDFilter) WhereID(p entql.UuidP) {
 	f.Where(p.Field(mixinid.FieldID))
 }
 

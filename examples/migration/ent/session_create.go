@@ -11,12 +11,12 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/examples/migration/ent/session"
 	"entgo.io/ent/examples/migration/ent/sessiondevice"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // SessionCreate is the builder for creating a Session entity.
@@ -181,10 +181,10 @@ func (_c *SessionCreate) sqlSave(ctx context.Context) (*Session, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(uuid.UUID); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Session.ID type: %T", _spec.ID.Value)
 		}
 	}
 	_c.mutation.id = &_node.ID
@@ -199,7 +199,7 @@ func (_c *SessionCreate) createSpec() (*Session, *sqlgraph.CreateSpec) {
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.Active(); ok {
 		_spec.SetField(session.FieldActive, field.TypeBool, value)

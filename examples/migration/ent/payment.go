@@ -66,13 +66,13 @@ func (*Payment) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case payment.FieldAmount:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.Null[float64])
 		case payment.FieldID, payment.FieldCardID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case payment.FieldCurrency, payment.FieldDescription, payment.FieldStatus:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case payment.FieldTime:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -89,46 +89,46 @@ func (_m *Payment) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case payment.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case payment.FieldCardID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field card_id", values[i])
 			} else if value.Valid {
-				_m.CardID = int(value.Int64)
+				_m.CardID = int(value.V)
 			}
 		case payment.FieldAmount:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.Null[float64]); !ok {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
-				_m.Amount = value.Float64
+				_m.Amount = float64(value.V)
 			}
 		case payment.FieldCurrency:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field currency", values[i])
 			} else if value.Valid {
-				_m.Currency = payment.Currency(value.String)
+				_m.Currency = payment.Currency(value.V)
 			}
 		case payment.FieldTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field time", values[i])
 			} else if value.Valid {
-				_m.Time = value.Time
+				_m.Time = time.Time(value.V)
 			}
 		case payment.FieldDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				_m.Description = value.String
+				_m.Description = string(value.V)
 			}
 		case payment.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				_m.Status = payment.Status(value.String)
+				_m.Status = payment.Status(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

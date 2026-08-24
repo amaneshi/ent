@@ -5,10 +5,11 @@
 package schema
 
 import (
+	"uuid"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 type NoteID string
@@ -28,7 +29,7 @@ func (Note) Fields() []ent.Field {
 			Unique().
 			Immutable().
 			DefaultFunc(func() NoteID {
-				return NoteID(uuid.NewString())
+				return NoteID(uuid.New().String())
 			}),
 		field.String("text").
 			Optional(),

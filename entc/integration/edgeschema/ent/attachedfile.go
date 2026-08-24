@@ -74,9 +74,9 @@ func (*AttachedFile) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case attachedfile.FieldID, attachedfile.FieldFID, attachedfile.FieldProcID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case attachedfile.FieldAttachTime:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -93,28 +93,28 @@ func (_m *AttachedFile) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case attachedfile.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case attachedfile.FieldAttachTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field attach_time", values[i])
 			} else if value.Valid {
-				_m.AttachTime = value.Time
+				_m.AttachTime = time.Time(value.V)
 			}
 		case attachedfile.FieldFID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field f_id", values[i])
 			} else if value.Valid {
-				_m.FID = int(value.Int64)
+				_m.FID = int(value.V)
 			}
 		case attachedfile.FieldProcID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field proc_id", values[i])
 			} else if value.Valid {
-				_m.ProcID = int(value.Int64)
+				_m.ProcID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

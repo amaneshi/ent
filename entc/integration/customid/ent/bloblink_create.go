@@ -11,13 +11,13 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/entc/integration/customid/ent/blob"
 	"entgo.io/ent/entc/integration/customid/ent/bloblink"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // BlobLinkCreate is the builder for creating a BlobLink entity.

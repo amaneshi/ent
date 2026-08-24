@@ -381,7 +381,7 @@ type UpdateSet struct {
 
 // Table returns the table the `UPSERT` statement is executed on.
 func (u *UpdateSet) Table() *SelectTable {
-	return Dialect(u.UpdateBuilder.dialect).Table(u.UpdateBuilder.table)
+	return Dialect(u.dialect).Table(u.table)
 }
 
 // Columns returns all columns in the `INSERT` statement.
@@ -391,7 +391,7 @@ func (u *UpdateSet) Columns() []string {
 
 // UpdateColumns returns all columns in the `UPDATE` statement.
 func (u *UpdateSet) UpdateColumns() []string {
-	return append(u.UpdateBuilder.nulls, u.UpdateBuilder.columns...)
+	return append(u.nulls, u.columns...)
 }
 
 // Set sets a column to a given value.
@@ -420,7 +420,7 @@ func (u *UpdateSet) SetIgnore(name string) *UpdateSet {
 // SetExcluded sets the column name to its EXCLUDED/VALUES value.
 // For example, "c" = "excluded"."c", or `c` = VALUES(`c`).
 func (u *UpdateSet) SetExcluded(name string) *UpdateSet {
-	switch u.UpdateBuilder.Dialect() {
+	switch u.Dialect() {
 	case dialect.MySQL:
 		u.UpdateBuilder.Set(name, ExprFunc(func(b *Builder) {
 			b.WriteString("VALUES(").Ident(name).WriteByte(')')
@@ -441,7 +441,7 @@ func (i *InsertBuilder) Query() (string, []any) {
 // QueryErr returns query representation of an `INSERT INTO`
 // statement and any error occurred in building the statement.
 func (i *InsertBuilder) QueryErr() (string, []any, error) {
-	b := i.Builder.clone()
+	b := i.clone()
 	b.WriteString("INSERT INTO ")
 	b.writeSchema(i.schema)
 	b.Ident(i.table).Pad()
@@ -640,7 +640,7 @@ func (u *UpdateBuilder) Returning(columns ...string) *UpdateBuilder {
 
 // Query returns query representation of an `UPDATE` statement.
 func (u *UpdateBuilder) Query() (string, []any) {
-	b := u.Builder.clone()
+	b := u.clone()
 	if len(u.prefix) > 0 {
 		b.join(u.prefix, " ")
 		b.Pad()
@@ -2170,6 +2170,7 @@ func (s *Selector) UnionAll(t TableView) *Selector {
 }
 
 // UnionDistinct appends the UNION DISTINCT clause to the query.
+//
 // Deprecated: use Union instead as by default, duplicate rows
 // are eliminated unless ALL is specified.
 func (s *Selector) UnionDistinct(t TableView) *Selector {
@@ -2237,7 +2238,7 @@ type setOpQuerier struct {
 }
 
 func (q *setOpQuerier) Query() (string, []any) {
-	b := q.Builder.clone()
+	b := q.clone()
 	// If no dialect was set explicitly on the querier (the common case — users
 	// call UnionAll(sel1, sel2) without a DialectBuilder), inherit it from the
 	// first selector so that b.sqlite() / b.postgres() return the right value.
@@ -2341,10 +2342,9 @@ func (s *Selector) Columns(columns ...string) []string {
 func (s *Selector) OnP(p *Predicate) *Selector {
 	if len(s.joins) > 0 {
 		join := &s.joins[len(s.joins)-1]
-		switch {
-		case join.on == nil:
+		if join.on == nil {
 			join.on = p
-		default:
+		} else {
 			join.on = And(join.on, p)
 		}
 	}
@@ -2480,7 +2480,7 @@ func (s *Selector) Clone() *Selector {
 		joins[i] = s.joins[i].clone()
 	}
 	return &Selector{
-		Builder:   s.Builder.clone(),
+		Builder:   s.clone(),
 		ctx:       s.ctx,
 		as:        s.as,
 		or:        s.or,
@@ -2577,7 +2577,7 @@ func (s *Selector) Having(p *Predicate) *Selector {
 
 // Query returns query representation of a `SELECT` statement.
 func (s *Selector) Query() (string, []any) {
-	b := s.Builder.clone()
+	b := s.clone()
 	s.joinPrefix(&b)
 	b.WriteString("SELECT ")
 	if s.distinct {
@@ -2930,7 +2930,7 @@ func (w *WindowBuilder) Query() (string, []any) {
 		}
 		joinOrder(w.order, b)
 	})
-	return w.Builder.String(), w.args
+	return w.String(), w.args
 }
 
 // Wrapper wraps a given Querier with different format.
@@ -3012,7 +3012,7 @@ type exprFunc struct {
 }
 
 func (e *exprFunc) Query() (string, []any) {
-	b := e.Builder.clone()
+	b := e.clone()
 	e.fn(&b)
 	return b.Query()
 }

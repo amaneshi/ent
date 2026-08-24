@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -19,7 +20,6 @@ import (
 	"entgo.io/ent/entc/integration/edgefield/ent/rental"
 	"entgo.io/ent/entc/integration/edgefield/ent/user"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // RentalQuery is the builder for querying Rental entities.

@@ -17,6 +17,7 @@ import (
 	"net/url"
 	"sync"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/entc/integration/ent/role"
@@ -42,7 +43,6 @@ import (
 	"entgo.io/ent/entc/integration/gremlin/ent/spec"
 	enttask "entgo.io/ent/entc/integration/gremlin/ent/task"
 	"entgo.io/ent/entc/integration/gremlin/ent/user"
-	"github.com/google/uuid"
 )
 
 const (
@@ -1722,7 +1722,7 @@ func (m *FieldTypeMutation) OldNdir(ctx context.Context) (v *http.Dir, err error
 // OldStr returns the old "str" field's value of the FieldType entity.
 // If the FieldType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FieldTypeMutation) OldStr(ctx context.Context) (v sql.NullString, err error) {
+func (m *FieldTypeMutation) OldStr(ctx context.Context) (v sql.Null[string], err error) {
 	if !m.Op().Is(OpUpdateOne) {
 		return v, errors.New("OldStr is only allowed on UpdateOne operations")
 	}
@@ -1739,7 +1739,7 @@ func (m *FieldTypeMutation) OldStr(ctx context.Context) (v sql.NullString, err e
 // OldNullStr returns the old "null_str" field's value of the FieldType entity.
 // If the FieldType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FieldTypeMutation) OldNullStr(ctx context.Context) (v *sql.NullString, err error) {
+func (m *FieldTypeMutation) OldNullStr(ctx context.Context) (v *sql.Null[string], err error) {
 	if !m.Op().Is(OpUpdateOne) {
 		return v, errors.New("OldNullStr is only allowed on UpdateOne operations")
 	}
@@ -1824,7 +1824,7 @@ func (m *FieldTypeMutation) OldNullActive(ctx context.Context) (v *schema.Status
 // OldDeleted returns the old "deleted" field's value of the FieldType entity.
 // If the FieldType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FieldTypeMutation) OldDeleted(ctx context.Context) (v *sql.NullBool, err error) {
+func (m *FieldTypeMutation) OldDeleted(ctx context.Context) (v *sql.Null[bool], err error) {
 	if !m.Op().Is(OpUpdateOne) {
 		return v, errors.New("OldDeleted is only allowed on UpdateOne operations")
 	}
@@ -1841,7 +1841,7 @@ func (m *FieldTypeMutation) OldDeleted(ctx context.Context) (v *sql.NullBool, er
 // OldDeletedAt returns the old "deleted_at" field's value of the FieldType entity.
 // If the FieldType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FieldTypeMutation) OldDeletedAt(ctx context.Context) (v *sql.NullTime, err error) {
+func (m *FieldTypeMutation) OldDeletedAt(ctx context.Context) (v *sql.Null[time.Time], err error) {
 	if !m.Op().Is(OpUpdateOne) {
 		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
 	}
@@ -1909,7 +1909,7 @@ func (m *FieldTypeMutation) OldIP(ctx context.Context) (v net.IP, err error) {
 // OldNullInt64 returns the old "null_int64" field's value of the FieldType entity.
 // If the FieldType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FieldTypeMutation) OldNullInt64(ctx context.Context) (v *sql.NullInt64, err error) {
+func (m *FieldTypeMutation) OldNullInt64(ctx context.Context) (v *sql.Null[int64], err error) {
 	if !m.Op().Is(OpUpdateOne) {
 		return v, errors.New("OldNullInt64 is only allowed on UpdateOne operations")
 	}
@@ -2011,7 +2011,7 @@ func (m *FieldTypeMutation) OldSchemaFloat32(ctx context.Context) (v schema.Floa
 // OldNullFloat returns the old "null_float" field's value of the FieldType entity.
 // If the FieldType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FieldTypeMutation) OldNullFloat(ctx context.Context) (v *sql.NullFloat64, err error) {
+func (m *FieldTypeMutation) OldNullFloat(ctx context.Context) (v *sql.Null[float64], err error) {
 	if !m.Op().Is(OpUpdateOne) {
 		return v, errors.New("OldNullFloat is only allowed on UpdateOne operations")
 	}

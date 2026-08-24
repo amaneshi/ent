@@ -140,7 +140,7 @@ type typerEncoder struct {
 }
 
 func (enc typerEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
-	enc.typeEncoder.Type = enc.typerOf(ptr).GraphsonType()
+	enc.Type = enc.typerOf(ptr).GraphsonType()
 	enc.typeEncoder.Encode(ptr, stream)
 }
 
@@ -150,6 +150,6 @@ type typerDecoder struct {
 }
 
 func (dec typerDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
-	dec.typeDecoder.typeChecker = dec.typerOf(ptr).GraphsonType()
+	dec.typeChecker = dec.typerOf(ptr).GraphsonType()
 	dec.typeDecoder.Decode(ptr, iter)
 }

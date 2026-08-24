@@ -8,11 +8,12 @@ package ent
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"errors"
 	"fmt"
 	"sync"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/entc/integration/edgefield/ent/car"
@@ -24,7 +25,6 @@ import (
 	"entgo.io/ent/entc/integration/edgefield/ent/post"
 	"entgo.io/ent/entc/integration/edgefield/ent/rental"
 	"entgo.io/ent/entc/integration/edgefield/ent/user"
-	"github.com/google/uuid"
 )
 
 const (
@@ -452,7 +452,7 @@ func (m *InfoMutation) IDs(ctx context.Context) ([]int, error) {
 // OldContent returns the old "content" field's value of the Info entity.
 // If the Info object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *InfoMutation) OldContent(ctx context.Context) (v json.RawMessage, err error) {
+func (m *InfoMutation) OldContent(ctx context.Context) (v jsontext.Value, err error) {
 	if !m.Op().Is(OpUpdateOne) {
 		return v, errors.New("OldContent is only allowed on UpdateOne operations")
 	}

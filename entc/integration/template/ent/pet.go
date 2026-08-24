@@ -58,11 +58,11 @@ func (*Pet) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case pet.FieldID, pet.FieldAge:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case pet.FieldLicensedAt:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		case pet.ForeignKeys[0]: // user_pets
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -79,30 +79,30 @@ func (_m *Pet) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case pet.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case pet.FieldAge:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field age", values[i])
 			} else if value.Valid {
-				_m.Age = int(value.Int64)
+				_m.Age = int(value.V)
 			}
 		case pet.FieldLicensedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field licensed_at", values[i])
 			} else if value.Valid {
 				_m.LicensedAt = new(time.Time)
-				*_m.LicensedAt = value.Time
+				*_m.LicensedAt = time.Time(value.V)
 			}
 		case pet.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_pets", value)
 			} else if value.Valid {
 				_m.user_pets = new(int)
-				*_m.user_pets = int(value.Int64)
+				*_m.user_pets = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

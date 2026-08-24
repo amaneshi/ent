@@ -11,12 +11,12 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/examples/migration/ent/session"
 	"entgo.io/ent/examples/migration/ent/sessiondevice"
-	"github.com/google/uuid"
 )
 
 // Session is the model entity for the Session schema.
@@ -70,13 +70,13 @@ func (*Session) scanValues(columns []string) ([]any, error) {
 		case session.FieldMethod:
 			values[i] = new([]byte)
 		case session.FieldActive:
-			values[i] = new(sql.NullBool)
+			values[i] = new(sql.Null[bool])
 		case session.FieldToken:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case session.FieldIssuedAt, session.FieldExpiresAt:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		case session.FieldID, session.FieldDeviceID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -93,34 +93,34 @@ func (_m *Session) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case session.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				_m.ID = *value
+			} else if value.Valid {
+				_m.ID = uuid.UUID(value.V)
 			}
 		case session.FieldActive:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*sql.Null[bool]); !ok {
 				return fmt.Errorf("unexpected type %T for field active", values[i])
 			} else if value.Valid {
-				_m.Active = value.Bool
+				_m.Active = bool(value.V)
 			}
 		case session.FieldIssuedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field issued_at", values[i])
 			} else if value.Valid {
-				_m.IssuedAt = value.Time
+				_m.IssuedAt = time.Time(value.V)
 			}
 		case session.FieldExpiresAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field expires_at", values[i])
 			} else if value.Valid {
-				_m.ExpiresAt = value.Time
+				_m.ExpiresAt = time.Time(value.V)
 			}
 		case session.FieldToken:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field token", values[i])
 			} else if value.Valid {
-				_m.Token = value.String
+				_m.Token = string(value.V)
 			}
 		case session.FieldMethod:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -131,10 +131,10 @@ func (_m *Session) assignValues(columns []string, values []any) error {
 				}
 			}
 		case session.FieldDeviceID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field device_id", values[i])
-			} else if value != nil {
-				_m.DeviceID = *value
+			} else if value.Valid {
+				_m.DeviceID = uuid.UUID(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

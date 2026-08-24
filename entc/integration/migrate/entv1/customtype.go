@@ -31,9 +31,9 @@ func (*CustomType) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case customtype.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case customtype.FieldCustom:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -50,16 +50,16 @@ func (_m *CustomType) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case customtype.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case customtype.FieldCustom:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field custom", values[i])
 			} else if value.Valid {
-				_m.Custom = value.String
+				_m.Custom = string(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

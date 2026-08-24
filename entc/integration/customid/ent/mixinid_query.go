@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -17,7 +18,6 @@ import (
 	"entgo.io/ent/entc/integration/customid/ent/mixinid"
 	"entgo.io/ent/entc/integration/customid/ent/predicate"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // MixinIDQuery is the builder for querying MixinID entities.

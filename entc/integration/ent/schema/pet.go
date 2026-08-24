@@ -11,8 +11,6 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-
-	"github.com/google/uuid"
 )
 
 // Pet holds the schema definition for the Pet entity.
@@ -33,7 +31,7 @@ func (Pet) Fields() []ent.Field {
 		field.Float("age").
 			Default(0),
 		field.String("name"),
-		field.UUID("uuid", uuid.UUID{}).
+		field.UUID("uuid").
 			Optional(),
 		field.String("nickname").
 			Optional(),

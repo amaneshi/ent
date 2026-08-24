@@ -265,15 +265,15 @@ var (
 	// NdirValidator is a validator for the "ndir" field. It is called by the builders before save.
 	NdirValidator func(string) error
 	// DefaultStr holds the default value on creation for the "str" field.
-	DefaultStr func() sql.NullString
+	DefaultStr func() sql.Null[string]
 	// DefaultNullStr holds the default value on creation for the "null_str" field.
-	DefaultNullStr func() *sql.NullString
+	DefaultNullStr func() *sql.Null[string]
 	// LinkValidator is a validator for the "link" field. It is called by the builders before save.
 	LinkValidator func(string) error
 	// DefaultDeletedAt holds the default value on creation for the "deleted_at" field.
-	DefaultDeletedAt func() *sql.NullTime
+	DefaultDeletedAt func() *sql.Null[time.Time]
 	// UpdateDefaultDeletedAt holds the default value on update for the "deleted_at" field.
-	UpdateDefaultDeletedAt func() *sql.NullTime
+	UpdateDefaultDeletedAt func() *sql.Null[time.Time]
 	// RawDataValidator is a validator for the "raw_data" field. It is called by the builders before save.
 	RawDataValidator func([]byte) error
 	// DefaultIP holds the default value on creation for the "ip" field.

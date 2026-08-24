@@ -11,6 +11,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"math"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -19,7 +20,6 @@ import (
 	"entgo.io/ent/entc/integration/edgefield/ent/predicate"
 	"entgo.io/ent/entc/integration/edgefield/ent/rental"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // CarQuery is the builder for querying Car entities.

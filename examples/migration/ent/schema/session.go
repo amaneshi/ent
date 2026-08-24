@@ -1,13 +1,14 @@
 package schema
 
 import (
+	"uuid"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"github.com/google/uuid"
 )
 
 // Session holds the schema definition for the Session entity.
@@ -18,7 +19,7 @@ type Session struct {
 // Fields of the Session.
 func (Session) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.Nil).
+		field.UUID("id").
 			Default(uuid.New),
 		field.Bool("active").
 			Default(false),
@@ -29,7 +30,7 @@ func (Session) Fields() []ent.Field {
 			Optional(),
 		field.JSON("method", map[string]any{}).
 			Optional(),
-		field.UUID("device_id", uuid.Nil).
+		field.UUID("device_id").
 			Optional(),
 	}
 }
@@ -70,7 +71,7 @@ type SessionDevice struct {
 // Fields of the SessionDevice.
 func (SessionDevice) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.Nil).
+		field.UUID("id").
 			Default(uuid.New),
 		field.String("ip_address").
 			MaxLen(50),

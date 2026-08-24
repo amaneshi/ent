@@ -10,13 +10,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/entc/integration/customid/ent/blob"
 	"entgo.io/ent/entc/integration/customid/ent/predicate"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // BlobUpdate is the builder for updating Blob entities.

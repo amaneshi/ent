@@ -25,6 +25,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -795,11 +796,13 @@ func Select(t *testing.T, client *ent.Client) {
 	const (
 		as1 = "name_length"
 		as2 = "another_name"
+		as3 = "optional_uuid"
 	)
 	pets = client.Pet.Query().
 		Modify(func(s *sql.Selector) {
 			s.AppendSelectAs("LENGTH(name)", as1)
 			s.AppendSelectAs("optional_time", as2)
+			s.AppendSelectAs("uuid", as3)
 		}).
 		AllX(ctx)
 	for _, p := range pets {
@@ -809,13 +812,17 @@ func Select(t *testing.T, client *ent.Client) {
 		v, err := p.Value(as2)
 		require.NoError(err)
 		require.Nil(v)
+		u, err := p.Value(as3)
+		require.NoError(err)
+		require.Nil(u)
 	}
 
 	// Update and scan.
-	require.NoError(client.Pet.Update().SetOptionalTime(time.Now()).Exec(ctx))
+	require.NoError(client.Pet.Update().SetOptionalTime(time.Now()).SetUUID(uuid.New()).Exec(ctx))
 	pets = client.Pet.Query().
 		Modify(func(s *sql.Selector) {
 			s.AppendSelectAs("optional_time", as2)
+			s.AppendSelectAs("uuid", as3)
 		}).
 		AllX(ctx)
 	for _, p := range pets {
@@ -824,6 +831,13 @@ func Select(t *testing.T, client *ent.Client) {
 		tv, ok := v.(time.Time)
 		require.True(ok)
 		require.True(!tv.IsZero())
+		u, err := p.Value(as3)
+		require.NoError(err)
+		us, ok := u.(string)
+		require.True(ok)
+		uu, err := uuid.Parse(us)
+		require.NoError(err)
+		require.True(uu != uuid.Nil())
 	}
 
 	// Order by random value should compile a valid query.

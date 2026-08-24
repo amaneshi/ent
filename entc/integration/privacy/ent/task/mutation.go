@@ -9,11 +9,11 @@ package task
 import (
 	"context"
 	"fmt"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/privacy/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // Mutation represents an operation that mutates the Task nodes in the graph.

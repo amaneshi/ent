@@ -75,9 +75,9 @@ func (*Friendship) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case friendship.FieldID, friendship.FieldWeight, friendship.FieldUserID, friendship.FieldFriendID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case friendship.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -94,34 +94,34 @@ func (_m *Friendship) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case friendship.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case friendship.FieldWeight:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field weight", values[i])
 			} else if value.Valid {
-				_m.Weight = int(value.Int64)
+				_m.Weight = int(value.V)
 			}
 		case friendship.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				_m.CreatedAt = value.Time
+				_m.CreatedAt = time.Time(value.V)
 			}
 		case friendship.FieldUserID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.UserID = int(value.Int64)
+				_m.UserID = int(value.V)
 			}
 		case friendship.FieldFriendID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field friend_id", values[i])
 			} else if value.Valid {
-				_m.FriendID = int(value.Int64)
+				_m.FriendID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

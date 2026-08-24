@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/gremlin"
 	"entgo.io/ent/dialect/gremlin/graph/dsl"
@@ -19,7 +20,6 @@ import (
 	"entgo.io/ent/entc/integration/gremlin/ent/pet"
 	"entgo.io/ent/entc/integration/gremlin/ent/predicate"
 	"entgo.io/ent/entc/integration/gremlin/ent/user"
-	"github.com/google/uuid"
 )
 
 // PetUpdate is the builder for updating Pet entities.

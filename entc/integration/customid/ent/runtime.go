@@ -8,6 +8,7 @@ package ent
 
 import (
 	"time"
+	"uuid"
 
 	"entgo.io/ent/entc/integration/customid/ent/account"
 	"entgo.io/ent/entc/integration/customid/ent/blob"
@@ -25,8 +26,6 @@ import (
 	"entgo.io/ent/entc/integration/customid/ent/token"
 	"entgo.io/ent/entc/integration/customid/ent/valuescan"
 	"entgo.io/ent/entc/integration/customid/sid"
-	uuidc "entgo.io/ent/entc/integration/customid/uuidcompatible"
-	"github.com/google/uuid"
 
 	"entgo.io/ent/schema/field"
 )
@@ -118,10 +117,6 @@ func init() {
 	linkDescLinkInformation := linkFields[1].Descriptor()
 	// link.DefaultLinkInformation holds the default value on creation for the link_information field.
 	link.DefaultLinkInformation = linkDescLinkInformation.Default.(map[string]schema.LinkInformation)
-	// linkDescID is the schema descriptor for id field.
-	linkDescID := linkFields[0].Descriptor()
-	// link.DefaultID holds the default value on creation for the id field.
-	link.DefaultID = linkDescID.Default.(func() uuidc.UUIDC)
 	mixinidMixin := schema.MixinID{}.Mixin()
 	mixinidMixinFields0 := mixinidMixin[0].Fields()
 	_ = mixinidMixinFields0

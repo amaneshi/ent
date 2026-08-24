@@ -72,9 +72,9 @@ func (*RoleUser) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case roleuser.FieldRoleID, roleuser.FieldUserID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case roleuser.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -91,22 +91,22 @@ func (_m *RoleUser) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case roleuser.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				_m.CreatedAt = value.Time
+				_m.CreatedAt = time.Time(value.V)
 			}
 		case roleuser.FieldRoleID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field role_id", values[i])
 			} else if value.Valid {
-				_m.RoleID = int(value.Int64)
+				_m.RoleID = int(value.V)
 			}
 		case roleuser.FieldUserID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.UserID = int(value.Int64)
+				_m.UserID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

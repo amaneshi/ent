@@ -571,11 +571,11 @@ func (_q *TagQuery) loadTweets(ctx context.Context, query *TweetQuery, nodes []*
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
+				return append([]any{new(sql.Null[int64])}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
+				outValue := int(values[0].(*sql.Null[int64]).V)
+				inValue := int(values[1].(*sql.Null[int64]).V)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Tag]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])
@@ -632,11 +632,11 @@ func (_q *TagQuery) loadGroups(ctx context.Context, query *GroupQuery, nodes []*
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
+				return append([]any{new(sql.Null[int64])}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
+				outValue := int(values[0].(*sql.Null[int64]).V)
+				inValue := int(values[1].(*sql.Null[int64]).V)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Tag]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

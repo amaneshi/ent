@@ -9,11 +9,11 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/customid/ent/mixinid"
-	"github.com/google/uuid"
 )
 
 // MixinID is the model entity for the MixinID schema.
@@ -34,9 +34,9 @@ func (*MixinID) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case mixinid.FieldSomeField, mixinid.FieldMixinField:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case mixinid.FieldID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -53,22 +53,22 @@ func (_m *MixinID) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case mixinid.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				_m.ID = *value
+			} else if value.Valid {
+				_m.ID = uuid.UUID(value.V)
 			}
 		case mixinid.FieldSomeField:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field some_field", values[i])
 			} else if value.Valid {
-				_m.SomeField = value.String
+				_m.SomeField = string(value.V)
 			}
 		case mixinid.FieldMixinField:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field mixin_field", values[i])
 			} else if value.Valid {
-				_m.MixinField = value.String
+				_m.MixinField = string(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

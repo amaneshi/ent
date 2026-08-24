@@ -12,13 +12,12 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/entc/integration/customid/ent/migrate"
 	"entgo.io/ent/entc/integration/customid/ent/schema"
 	"entgo.io/ent/entc/integration/customid/sid"
-	uuidc "entgo.io/ent/entc/integration/customid/uuidcompatible"
-	"github.com/google/uuid"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -1669,7 +1668,7 @@ func (c *LinkClient) UpdateOne(_m *Link) *LinkUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *LinkClient) UpdateOneID(id uuidc.UUIDC) *LinkUpdateOne {
+func (c *LinkClient) UpdateOneID(id uuid.UUID) *LinkUpdateOne {
 	mutation := newLinkMutation(c.config, OpUpdateOne, withLinkID(id))
 	return &LinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1686,7 +1685,7 @@ func (c *LinkClient) DeleteOne(_m *Link) *LinkDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *LinkClient) DeleteOneID(id uuidc.UUIDC) *LinkDeleteOne {
+func (c *LinkClient) DeleteOneID(id uuid.UUID) *LinkDeleteOne {
 	builder := c.Delete().Where(link.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.SetOp(OpDeleteOne)
@@ -1703,12 +1702,12 @@ func (c *LinkClient) Query() *LinkQuery {
 }
 
 // Get returns a Link entity by its id.
-func (c *LinkClient) Get(ctx context.Context, id uuidc.UUIDC) (*Link, error) {
+func (c *LinkClient) Get(ctx context.Context, id uuid.UUID) (*Link, error) {
 	return c.Query().Where(link.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *LinkClient) GetX(ctx context.Context, id uuidc.UUIDC) *Link {
+func (c *LinkClient) GetX(ctx context.Context, id uuid.UUID) *Link {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

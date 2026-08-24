@@ -250,18 +250,10 @@ type (
 	Rows struct{ ColumnScanner }
 	// Result is an alias to sql.Result.
 	Result = sql.Result
-	// NullBool is an alias to sql.NullBool.
-	NullBool = sql.NullBool
-	// NullInt64 is an alias to sql.NullInt64.
-	NullInt64 = sql.NullInt64
-	// NullString is an alias to sql.NullString.
-	NullString = sql.NullString
-	// NullFloat64 is an alias to sql.NullFloat64.
-	NullFloat64 = sql.NullFloat64
-	// NullTime represents a time.Time that may be null.
-	NullTime = sql.NullTime
 	// TxOptions holds the transaction options to be used in DB.BeginTx.
 	TxOptions = sql.TxOptions
+	// Null is an alias to sql.Null[T].
+	Null[T any] = sql.Null[T]
 )
 
 // NullScanner implements the sql.Scanner interface such that it

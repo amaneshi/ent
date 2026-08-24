@@ -66,7 +66,6 @@ import (
 	"time"
 	"net/url"
 
-	"github.com/google/uuid"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -96,7 +95,7 @@ func (User) Fields() []ent.Field {
 		field.Enum("state").
 			Values("on", "off").
 			Optional(),
-		field.UUID("uuid", uuid.UUID{}).
+		field.UUID("uuid").
 			Default(uuid.New),
 	}
 }
@@ -129,7 +128,7 @@ func (Group) Fields() []ent.Field {
 // Fields of the Blob.
 func (Blob) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
+		field.UUID("id").
 			Default(uuid.New).
 			StorageKey("oid"),
 	}
@@ -236,7 +235,7 @@ func (Card) Fields() []ent.Field {
 		field.String("name").
 			Optional().
 			// A ValueScanner type.
-			GoType(&sql.NullString{}),
+			GoType(&sql.Null[string]{}),
 		field.Enum("role").
 			// A convertible type to string.
 			GoType(role.Role("")),
@@ -297,11 +296,11 @@ for `driver.Value` and `S` for `sql.Scanner`:
 
 ```go
 field.String("encoded").
-	ValueScanner(field.ValueScannerFunc[string, *sql.NullString]{
+	ValueScanner(field.ValueScannerFunc[string, *sql.Null[string]]{
 		V: func(s string) (driver.Value, error) {
 			return base64.StdEncoding.EncodeToString([]byte(s)), nil
 		},
-		S: func(ns *sql.NullString) (string, error) {
+		S: func(ns *sql.Null[string]) (string, error) {
 			if !ns.Valid {
 				return "", nil
 			}
@@ -338,12 +337,12 @@ func (p PrefixedHex) Value(s string) (driver.Value, error) {
 
 // ScanValue implements the TypeValueScanner.ScanValue method.
 func (PrefixedHex) ScanValue() field.ValueScanner {
-	return &sql.NullString{}
+	return &sql.Null[string]{}
 }
 
 // FromValue implements the TypeValueScanner.FromValue method.
 func (p PrefixedHex) FromValue(v driver.Value) (string, error) {
-	s, ok := v.(*sql.NullString)
+	s, ok := v.(*sql.Null[string])
 	if !ok {
 		return "", fmt.Errorf("unexpected input for FromValue: %T", v)
 	}

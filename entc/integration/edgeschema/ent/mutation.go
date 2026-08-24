@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/entc/integration/edgeschema/ent/attachedfile"
@@ -32,7 +33,6 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/user"
 	"entgo.io/ent/entc/integration/edgeschema/ent/usergroup"
 	"entgo.io/ent/entc/integration/edgeschema/ent/usertweet"
-	"github.com/google/uuid"
 )
 
 const (

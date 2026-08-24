@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -18,7 +19,6 @@ import (
 	"entgo.io/ent/examples/migration/ent/session"
 	"entgo.io/ent/examples/migration/ent/sessiondevice"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // SessionQuery is the builder for querying Session entities.

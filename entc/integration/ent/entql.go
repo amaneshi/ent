@@ -1388,13 +1388,13 @@ func (f *FieldTypeFilter) WherePriority(p entql.StringP) {
 	f.Where(p.Field(fieldtype.FieldPriority))
 }
 
-// WhereOptionalUUID applies the entql [16]byte predicate on the optional_uuid field.
-func (f *FieldTypeFilter) WhereOptionalUUID(p entql.ValueP) {
+// WhereOptionalUUID applies the entql uuid.UUID predicate on the optional_uuid field.
+func (f *FieldTypeFilter) WhereOptionalUUID(p entql.UuidP) {
 	f.Where(p.Field(fieldtype.FieldOptionalUUID))
 }
 
-// WhereNillableUUID applies the entql [16]byte predicate on the nillable_uuid field.
-func (f *FieldTypeFilter) WhereNillableUUID(p entql.ValueP) {
+// WhereNillableUUID applies the entql uuid.UUID predicate on the nillable_uuid field.
+func (f *FieldTypeFilter) WhereNillableUUID(p entql.UuidP) {
 	f.Where(p.Field(fieldtype.FieldNillableUUID))
 }
 
@@ -2112,8 +2112,8 @@ func (f *PetFilter) WhereName(p entql.StringP) {
 	f.Where(p.Field(pet.FieldName))
 }
 
-// WhereUUID applies the entql [16]byte predicate on the uuid field.
-func (f *PetFilter) WhereUUID(p entql.ValueP) {
+// WhereUUID applies the entql uuid.UUID predicate on the uuid field.
+func (f *PetFilter) WhereUUID(p entql.UuidP) {
 	f.Where(p.Field(pet.FieldUUID))
 }
 

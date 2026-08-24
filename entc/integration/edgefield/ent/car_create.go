@@ -9,12 +9,12 @@ package ent
 import (
 	"context"
 	"fmt"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/entc/integration/edgefield/ent/car"
 	"entgo.io/ent/entc/integration/edgefield/ent/rental"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // CarCreate is the builder for creating a Car entity.
@@ -125,10 +125,10 @@ func (_c *CarCreate) sqlSave(ctx context.Context) (*Car, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(uuid.UUID); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Car.ID type: %T", _spec.ID.Value)
 		}
 	}
 	_c.mutation.id = &_node.ID
@@ -143,7 +143,7 @@ func (_c *CarCreate) createSpec() (*Car, *sqlgraph.CreateSpec) {
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.Number(); ok {
 		_spec.SetField(car.FieldNumber, field.TypeString, value)

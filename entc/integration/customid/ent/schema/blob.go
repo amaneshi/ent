@@ -6,6 +6,7 @@ package schema
 
 import (
 	"time"
+	"uuid"
 
 	"entgo.io/ent/schema"
 
@@ -13,8 +14,6 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-
-	"github.com/google/uuid"
 )
 
 // Blob holds the schema definition for the Blob entity.
@@ -25,13 +24,13 @@ type Blob struct {
 // Fields of the Blob.
 func (Blob) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
+		field.UUID("id").
 			Default(uuid.New).
 			Annotations(entsql.Annotation{
 				Default: "uuid_generate_v4()",
 			}).
 			Unique(),
-		field.UUID("uuid", uuid.UUID{}).
+		field.UUID("uuid").
 			Default(uuid.New).
 			Unique(),
 		field.Int("count").
@@ -66,8 +65,8 @@ func (BlobLink) Fields() []ent.Field {
 	return []ent.Field{
 		field.Time("created_at").
 			Default(time.Now),
-		field.UUID("blob_id", uuid.UUID{}),
-		field.UUID("link_id", uuid.UUID{}),
+		field.UUID("blob_id"),
+		field.UUID("link_id"),
 	}
 }
 

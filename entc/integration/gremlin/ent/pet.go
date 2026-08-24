@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/gremlin"
 	"entgo.io/ent/entc/integration/gremlin/ent/user"
-	"github.com/google/uuid"
 )
 
 // Pet is the model entity for the Pet schema.

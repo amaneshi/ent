@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -18,7 +19,6 @@ import (
 	"entgo.io/ent/entc/integration/customid/ent/bloblink"
 	"entgo.io/ent/entc/integration/customid/ent/predicate"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // BlobLinkUpdate is the builder for updating BlobLink entities.

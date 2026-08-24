@@ -9,6 +9,7 @@ import (
 	"errors"
 	"testing"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/entc/integration/edgeschema/ent"
@@ -25,7 +26,6 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/user"
 	"entgo.io/ent/entql"
 
-	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/require"
 )
@@ -193,11 +193,11 @@ func TestEdgeSchemaDefaultID(t *testing.T) {
 	tag1 := client.Tag.Create().SetValue("1").SaveX(ctx)
 	tweet1.Update().AddTags(tag1).SaveX(ctx)
 	require.Equal(t, tag1.ID, tweet1.QueryTags().OnlyIDX(ctx))
-	require.NotEqual(t, uuid.Nil, tweet1.QueryTweetTags().OnlyIDX(ctx))
+	require.NotEqual(t, uuid.Nil(), tweet1.QueryTweetTags().OnlyIDX(ctx))
 
 	tweet2 := client.Tweet.Create().SetText("bar").AddTags(tag1).SaveX(ctx)
 	require.Equal(t, tag1.ID, tweet2.QueryTags().OnlyIDX(ctx))
-	require.NotEqual(t, uuid.Nil, tweet2.QueryTweetTags().OnlyIDX(ctx))
+	require.NotEqual(t, uuid.Nil(), tweet2.QueryTweetTags().OnlyIDX(ctx))
 }
 
 func TestEdgeSchemaBidiWithID(t *testing.T) {

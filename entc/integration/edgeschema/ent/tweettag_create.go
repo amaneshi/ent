@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -19,7 +20,6 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/tweet"
 	"entgo.io/ent/entc/integration/edgeschema/ent/tweettag"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // TweetTagCreate is the builder for creating a TweetTag entity.
@@ -157,10 +157,10 @@ func (_c *TweetTagCreate) sqlSave(ctx context.Context) (*TweetTag, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(uuid.UUID); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected TweetTag.ID type: %T", _spec.ID.Value)
 		}
 	}
 	_c.mutation.id = &_node.ID
@@ -176,7 +176,7 @@ func (_c *TweetTagCreate) createSpec() (*TweetTag, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.AddedAt(); ok {
 		_spec.SetField(tweettag.FieldAddedAt, field.TypeTime, value)

@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/examples/migration/ent/sessiondevice"
-	"github.com/google/uuid"
 )
 
 // SessionDevice is the model entity for the SessionDevice schema.
@@ -62,11 +62,11 @@ func (*SessionDevice) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case sessiondevice.FieldIPAddress, sessiondevice.FieldUserAgent, sessiondevice.FieldLocation:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case sessiondevice.FieldCreatedAt, sessiondevice.FieldUpdatedAt:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		case sessiondevice.FieldID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -83,40 +83,40 @@ func (_m *SessionDevice) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case sessiondevice.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				_m.ID = *value
+			} else if value.Valid {
+				_m.ID = uuid.UUID(value.V)
 			}
 		case sessiondevice.FieldIPAddress:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field ip_address", values[i])
 			} else if value.Valid {
-				_m.IPAddress = value.String
+				_m.IPAddress = string(value.V)
 			}
 		case sessiondevice.FieldUserAgent:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field user_agent", values[i])
 			} else if value.Valid {
-				_m.UserAgent = value.String
+				_m.UserAgent = string(value.V)
 			}
 		case sessiondevice.FieldLocation:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field location", values[i])
 			} else if value.Valid {
-				_m.Location = value.String
+				_m.Location = string(value.V)
 			}
 		case sessiondevice.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				_m.CreatedAt = value.Time
+				_m.CreatedAt = time.Time(value.V)
 			}
 		case sessiondevice.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				_m.UpdatedAt = value.Time
+				_m.UpdatedAt = time.Time(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

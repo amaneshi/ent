@@ -9,6 +9,7 @@ package runtime
 import (
 	"context"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/entc/integration/edgeschema/ent/attachedfile"
 	"entgo.io/ent/entc/integration/edgeschema/ent/friendship"
@@ -23,7 +24,6 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/user"
 	"entgo.io/ent/entc/integration/edgeschema/ent/usergroup"
 	"entgo.io/ent/entc/integration/edgeschema/ent/usertweet"
-	"github.com/google/uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/privacy"

@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -18,7 +19,6 @@ import (
 	"entgo.io/ent/entc/integration/ent/predicate"
 	"entgo.io/ent/entc/integration/ent/user"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // PetUpdate is the builder for updating Pet entities.

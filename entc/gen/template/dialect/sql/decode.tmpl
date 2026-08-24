@@ -50,7 +50,7 @@ func (*{{ $.Name }}) scanValues(columns []string) ([]any, error) {
 			{{- range $i, $fk := $.UnexportedForeignKeys }}
 				{{- $f := $fk.Field }}
 				case {{ $.Package }}.ForeignKeys[{{ $i }}]: // {{ $f.Name }}
-					values[i] = {{ if not $f.UserDefined }}new(sql.NullInt64){{ else }}{{ $f.NewScanType }}{{ end }}
+					values[i] = {{ if not $f.UserDefined }}new(sql.Null[int64]){{ else }}{{ $f.NewScanType }}{{ end }}
 			{{- end }}
 			default:
 				{{- /* In case of unknown column that was added by a modifier, predicate, etc., fallback to any. */}}
@@ -75,11 +75,11 @@ func ({{ $receiver }} *{{ $.Name }}) assignValues(columns []string, values []any
 						{{ template "dialect/sql/decode/field" . }}
 					{{- end }}
 				{{- else }}
-					value, ok := values[i].(*sql.NullInt64)
+					value, ok := values[i].(*sql.Null[int64])
 					if !ok {
 						return fmt.Errorf("unexpected type %T for field id", value)
 					}
-					{{ $receiver }}.ID = {{ $.ID.Type }}(value.Int64)
+					{{ $receiver }}.ID = {{ $.ID.Type }}(value.V)
 				{{- end }}
 		{{- end }}
 		{{- range  $f := $.Fields }}
@@ -91,16 +91,16 @@ func ({{ $receiver }} *{{ $.Name }}) assignValues(columns []string, values []any
 		{{- range $i, $fk := $.UnexportedForeignKeys }}
 			{{- $f := $fk.Field }}
 			case {{ if $fk.UserDefined }}{{ $.Package }}.{{ $.ID.Constant }}{{ else }}{{ $.Package }}.ForeignKeys[{{ $i }}]{{ end }}:
-				{{- if or $fk.UserDefined (and $f.UserDefined (or $f.IsString $f.IsBytes $f.HasGoType)) }}
+				{{- if or $fk.UserDefined (and $f.UserDefined (or $f.IsString $f.IsBytes $f.IsUUID $f.HasGoType)) }}
 					{{- with extend $ "Idx" "i" "Field" $f "Rec" $receiver "StructField" $fk.StructField }}
 						{{ template "dialect/sql/decode/field" . }}
 					{{- end }}
 				{{- else }}
-					if value, ok := values[i].(*sql.NullInt64); !ok {
+					if value, ok := values[i].(*sql.Null[int64]); !ok {
 						return fmt.Errorf("unexpected type %T for edge-field {{ $f.Name}}", value)
 					} else if value.Valid {
 						{{ $receiver }}.{{ $fk.StructField }} = new({{ $f.Type }})
-						{{ if and $f.Nillable (not $f.Type.Nillable) }}*{{ end }}{{ $receiver }}.{{ $fk.StructField }} = {{ $f.Type }}(value.Int64)
+						{{ if and $f.Nillable (not $f.Type.Nillable) }}*{{ end }}{{ $receiver }}.{{ $fk.StructField }} = {{ $f.Type }}(value.V)
 					}
 				{{- end }}
 		{{- end }}

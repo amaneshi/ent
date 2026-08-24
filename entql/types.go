@@ -9,6 +9,7 @@ package entql
 import (
 	"database/sql/driver"
 	"time"
+	"uuid"
 )
 
 //go:generate go run internal/gen.go
@@ -1811,58 +1812,58 @@ func StringNot(x StringP) StringP {
 	return expr
 }
 
-// ValueP is the interface for predicates of type [16]byte (`type P[[16]byte]`).
-type ValueP interface {
+// UuidP is the interface for predicates of type uuid.UUID (`type P[uuid.UUID]`).
+type UuidP interface {
 	Fielder
-	value()
+	uuid()
 }
 
-// valueP implements the ValueP interface.
-type valueP struct {
+// uuidP implements the UuidP interface.
+type uuidP struct {
 	P
 	done func(string)
 }
 
-func (p *valueP) Field(name string) P {
+func (p *uuidP) Field(name string) P {
 	p.done(name)
 	return p.P
 }
 
-func (*valueP) value() {}
+func (*uuidP) uuid() {}
 
-// ValueNil applies the Nil operation
-func ValueNil() ValueP {
+// UuidNil applies the Nil operation
+func UuidNil() UuidP {
 	field := &Field{}
 	done := func(name string) { field.Name = name }
-	return &valueP{P: EQ(field, (*Value)(nil)), done: done}
+	return &uuidP{P: EQ(field, (*Value)(nil)), done: done}
 }
 
-// ValueNotNil applies the NotNil operation
-func ValueNotNil() ValueP {
+// UuidNotNil applies the NotNil operation
+func UuidNotNil() UuidP {
 	field := &Field{}
 	done := func(name string) { field.Name = name }
-	return &valueP{P: NEQ(field, (*Value)(nil)), done: done}
+	return &uuidP{P: NEQ(field, (*Value)(nil)), done: done}
 }
 
-// ValueEQ applies the EQ operation on the given value.
-func ValueEQ(v driver.Valuer) ValueP {
-	field := &Field{}
-	value := &Value{V: v}
-	done := func(name string) { field.Name = name }
-	return &valueP{P: EQ(field, value), done: done}
-}
-
-// ValueNEQ applies the NEQ operation on the given value.
-func ValueNEQ(v driver.Valuer) ValueP {
+// UuidEQ applies the EQ operation on the given value.
+func UuidEQ(v uuid.UUID) UuidP {
 	field := &Field{}
 	value := &Value{V: v}
 	done := func(name string) { field.Name = name }
-	return &valueP{P: NEQ(field, value), done: done}
+	return &uuidP{P: EQ(field, value), done: done}
 }
 
-// ValueOr returns a composed predicate that represents the logical OR predicate.
-func ValueOr(x, y ValueP, z ...ValueP) ValueP {
-	expr := &valueP{}
+// UuidNEQ applies the NEQ operation on the given value.
+func UuidNEQ(v uuid.UUID) UuidP {
+	field := &Field{}
+	value := &Value{V: v}
+	done := func(name string) { field.Name = name }
+	return &uuidP{P: NEQ(field, value), done: done}
+}
+
+// UuidOr returns a composed predicate that represents the logical OR predicate.
+func UuidOr(x, y UuidP, z ...UuidP) UuidP {
+	expr := &uuidP{}
 	expr.done = func(name string) {
 		zs := make([]P, len(z))
 		for i := range z {
@@ -1873,9 +1874,9 @@ func ValueOr(x, y ValueP, z ...ValueP) ValueP {
 	return expr
 }
 
-// ValueAnd returns a composed predicate that represents the logical AND predicate.
-func ValueAnd(x, y ValueP, z ...ValueP) ValueP {
-	expr := &valueP{}
+// UuidAnd returns a composed predicate that represents the logical AND predicate.
+func UuidAnd(x, y UuidP, z ...UuidP) UuidP {
+	expr := &uuidP{}
 	expr.done = func(name string) {
 		zs := make([]P, len(z))
 		for i := range z {
@@ -1886,9 +1887,9 @@ func ValueAnd(x, y ValueP, z ...ValueP) ValueP {
 	return expr
 }
 
-// ValueNot returns a predicate that represents the logical negation of the given predicate.
-func ValueNot(x ValueP) ValueP {
-	expr := &valueP{}
+// UuidNot returns a predicate that represents the logical negation of the given predicate.
+func UuidNot(x UuidP) UuidP {
+	expr := &uuidP{}
 	expr.done = func(name string) {
 		expr.P = Not(x.Field(name))
 	}

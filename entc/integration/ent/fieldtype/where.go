@@ -10,12 +10,12 @@ import (
 	"net"
 	"net/http"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/ent/predicate"
 	"entgo.io/ent/entc/integration/ent/role"
 	"entgo.io/ent/entc/integration/ent/schema"
-	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
@@ -242,12 +242,12 @@ func Ndir(v http.Dir) predicate.FieldType {
 }
 
 // Str applies equality check predicate on the "str" field. It's identical to StrEQ.
-func Str(v sql.NullString) predicate.FieldType {
+func Str(v sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldStr, v))
 }
 
 // NullStr applies equality check predicate on the "null_str" field. It's identical to NullStrEQ.
-func NullStr(v *sql.NullString) predicate.FieldType {
+func NullStr(v *sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldNullStr, v))
 }
 
@@ -274,12 +274,12 @@ func NullActive(v schema.Status) predicate.FieldType {
 }
 
 // Deleted applies equality check predicate on the "deleted" field. It's identical to DeletedEQ.
-func Deleted(v *sql.NullBool) predicate.FieldType {
+func Deleted(v *sql.Null[bool]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldDeleted, v))
 }
 
 // DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v *sql.NullTime) predicate.FieldType {
+func DeletedAt(v *sql.Null[time.Time]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldDeletedAt, v))
 }
 
@@ -300,7 +300,7 @@ func IP(v net.IP) predicate.FieldType {
 }
 
 // NullInt64 applies equality check predicate on the "null_int64" field. It's identical to NullInt64EQ.
-func NullInt64(v *sql.NullInt64) predicate.FieldType {
+func NullInt64(v *sql.Null[int64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldNullInt64, v))
 }
 
@@ -335,7 +335,7 @@ func SchemaFloat32(v schema.Float32) predicate.FieldType {
 }
 
 // NullFloat applies equality check predicate on the "null_float" field. It's identical to NullFloatEQ.
-func NullFloat(v *sql.NullFloat64) predicate.FieldType {
+func NullFloat(v *sql.Null[float64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldNullFloat, v))
 }
 
@@ -2312,60 +2312,60 @@ func NdirContainsFold(v http.Dir) predicate.FieldType {
 }
 
 // StrEQ applies the EQ predicate on the "str" field.
-func StrEQ(v sql.NullString) predicate.FieldType {
+func StrEQ(v sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldStr, v))
 }
 
 // StrNEQ applies the NEQ predicate on the "str" field.
-func StrNEQ(v sql.NullString) predicate.FieldType {
+func StrNEQ(v sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNEQ(FieldStr, v))
 }
 
 // StrIn applies the In predicate on the "str" field.
-func StrIn(vs ...sql.NullString) predicate.FieldType {
+func StrIn(vs ...sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldIn(FieldStr, vs...))
 }
 
 // StrNotIn applies the NotIn predicate on the "str" field.
-func StrNotIn(vs ...sql.NullString) predicate.FieldType {
+func StrNotIn(vs ...sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNotIn(FieldStr, vs...))
 }
 
 // StrGT applies the GT predicate on the "str" field.
-func StrGT(v sql.NullString) predicate.FieldType {
+func StrGT(v sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGT(FieldStr, v))
 }
 
 // StrGTE applies the GTE predicate on the "str" field.
-func StrGTE(v sql.NullString) predicate.FieldType {
+func StrGTE(v sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGTE(FieldStr, v))
 }
 
 // StrLT applies the LT predicate on the "str" field.
-func StrLT(v sql.NullString) predicate.FieldType {
+func StrLT(v sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLT(FieldStr, v))
 }
 
 // StrLTE applies the LTE predicate on the "str" field.
-func StrLTE(v sql.NullString) predicate.FieldType {
+func StrLTE(v sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLTE(FieldStr, v))
 }
 
 // StrContains applies the Contains predicate on the "str" field.
-func StrContains(v sql.NullString) predicate.FieldType {
-	vc := v.String
+func StrContains(v sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldContains(FieldStr, vc))
 }
 
 // StrHasPrefix applies the HasPrefix predicate on the "str" field.
-func StrHasPrefix(v sql.NullString) predicate.FieldType {
-	vc := v.String
+func StrHasPrefix(v sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldHasPrefix(FieldStr, vc))
 }
 
 // StrHasSuffix applies the HasSuffix predicate on the "str" field.
-func StrHasSuffix(v sql.NullString) predicate.FieldType {
-	vc := v.String
+func StrHasSuffix(v sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldHasSuffix(FieldStr, vc))
 }
 
@@ -2380,72 +2380,72 @@ func StrNotNil() predicate.FieldType {
 }
 
 // StrEqualFold applies the EqualFold predicate on the "str" field.
-func StrEqualFold(v sql.NullString) predicate.FieldType {
-	vc := v.String
+func StrEqualFold(v sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldEqualFold(FieldStr, vc))
 }
 
 // StrContainsFold applies the ContainsFold predicate on the "str" field.
-func StrContainsFold(v sql.NullString) predicate.FieldType {
-	vc := v.String
+func StrContainsFold(v sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldContainsFold(FieldStr, vc))
 }
 
 // NullStrEQ applies the EQ predicate on the "null_str" field.
-func NullStrEQ(v *sql.NullString) predicate.FieldType {
+func NullStrEQ(v *sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldNullStr, v))
 }
 
 // NullStrNEQ applies the NEQ predicate on the "null_str" field.
-func NullStrNEQ(v *sql.NullString) predicate.FieldType {
+func NullStrNEQ(v *sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNEQ(FieldNullStr, v))
 }
 
 // NullStrIn applies the In predicate on the "null_str" field.
-func NullStrIn(vs ...*sql.NullString) predicate.FieldType {
+func NullStrIn(vs ...*sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldIn(FieldNullStr, vs...))
 }
 
 // NullStrNotIn applies the NotIn predicate on the "null_str" field.
-func NullStrNotIn(vs ...*sql.NullString) predicate.FieldType {
+func NullStrNotIn(vs ...*sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNotIn(FieldNullStr, vs...))
 }
 
 // NullStrGT applies the GT predicate on the "null_str" field.
-func NullStrGT(v *sql.NullString) predicate.FieldType {
+func NullStrGT(v *sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGT(FieldNullStr, v))
 }
 
 // NullStrGTE applies the GTE predicate on the "null_str" field.
-func NullStrGTE(v *sql.NullString) predicate.FieldType {
+func NullStrGTE(v *sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGTE(FieldNullStr, v))
 }
 
 // NullStrLT applies the LT predicate on the "null_str" field.
-func NullStrLT(v *sql.NullString) predicate.FieldType {
+func NullStrLT(v *sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLT(FieldNullStr, v))
 }
 
 // NullStrLTE applies the LTE predicate on the "null_str" field.
-func NullStrLTE(v *sql.NullString) predicate.FieldType {
+func NullStrLTE(v *sql.Null[string]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLTE(FieldNullStr, v))
 }
 
 // NullStrContains applies the Contains predicate on the "null_str" field.
-func NullStrContains(v *sql.NullString) predicate.FieldType {
-	vc := v.String
+func NullStrContains(v *sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldContains(FieldNullStr, vc))
 }
 
 // NullStrHasPrefix applies the HasPrefix predicate on the "null_str" field.
-func NullStrHasPrefix(v *sql.NullString) predicate.FieldType {
-	vc := v.String
+func NullStrHasPrefix(v *sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldHasPrefix(FieldNullStr, vc))
 }
 
 // NullStrHasSuffix applies the HasSuffix predicate on the "null_str" field.
-func NullStrHasSuffix(v *sql.NullString) predicate.FieldType {
-	vc := v.String
+func NullStrHasSuffix(v *sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldHasSuffix(FieldNullStr, vc))
 }
 
@@ -2460,14 +2460,14 @@ func NullStrNotNil() predicate.FieldType {
 }
 
 // NullStrEqualFold applies the EqualFold predicate on the "null_str" field.
-func NullStrEqualFold(v *sql.NullString) predicate.FieldType {
-	vc := v.String
+func NullStrEqualFold(v *sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldEqualFold(FieldNullStr, vc))
 }
 
 // NullStrContainsFold applies the ContainsFold predicate on the "null_str" field.
-func NullStrContainsFold(v *sql.NullString) predicate.FieldType {
-	vc := v.String
+func NullStrContainsFold(v *sql.Null[string]) predicate.FieldType {
+	vc := v.V
 	return predicate.FieldType(sql.FieldContainsFold(FieldNullStr, vc))
 }
 
@@ -2676,12 +2676,12 @@ func NullActiveNotNil() predicate.FieldType {
 }
 
 // DeletedEQ applies the EQ predicate on the "deleted" field.
-func DeletedEQ(v *sql.NullBool) predicate.FieldType {
+func DeletedEQ(v *sql.Null[bool]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldDeleted, v))
 }
 
 // DeletedNEQ applies the NEQ predicate on the "deleted" field.
-func DeletedNEQ(v *sql.NullBool) predicate.FieldType {
+func DeletedNEQ(v *sql.Null[bool]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNEQ(FieldDeleted, v))
 }
 
@@ -2696,42 +2696,42 @@ func DeletedNotNil() predicate.FieldType {
 }
 
 // DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v *sql.NullTime) predicate.FieldType {
+func DeletedAtEQ(v *sql.Null[time.Time]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldDeletedAt, v))
 }
 
 // DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v *sql.NullTime) predicate.FieldType {
+func DeletedAtNEQ(v *sql.Null[time.Time]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNEQ(FieldDeletedAt, v))
 }
 
 // DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...*sql.NullTime) predicate.FieldType {
+func DeletedAtIn(vs ...*sql.Null[time.Time]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldIn(FieldDeletedAt, vs...))
 }
 
 // DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...*sql.NullTime) predicate.FieldType {
+func DeletedAtNotIn(vs ...*sql.Null[time.Time]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNotIn(FieldDeletedAt, vs...))
 }
 
 // DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v *sql.NullTime) predicate.FieldType {
+func DeletedAtGT(v *sql.Null[time.Time]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGT(FieldDeletedAt, v))
 }
 
 // DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v *sql.NullTime) predicate.FieldType {
+func DeletedAtGTE(v *sql.Null[time.Time]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGTE(FieldDeletedAt, v))
 }
 
 // DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v *sql.NullTime) predicate.FieldType {
+func DeletedAtLT(v *sql.Null[time.Time]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLT(FieldDeletedAt, v))
 }
 
 // DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v *sql.NullTime) predicate.FieldType {
+func DeletedAtLTE(v *sql.Null[time.Time]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLTE(FieldDeletedAt, v))
 }
 
@@ -2910,42 +2910,42 @@ func IPNotNil() predicate.FieldType {
 }
 
 // NullInt64EQ applies the EQ predicate on the "null_int64" field.
-func NullInt64EQ(v *sql.NullInt64) predicate.FieldType {
+func NullInt64EQ(v *sql.Null[int64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldNullInt64, v))
 }
 
 // NullInt64NEQ applies the NEQ predicate on the "null_int64" field.
-func NullInt64NEQ(v *sql.NullInt64) predicate.FieldType {
+func NullInt64NEQ(v *sql.Null[int64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNEQ(FieldNullInt64, v))
 }
 
 // NullInt64In applies the In predicate on the "null_int64" field.
-func NullInt64In(vs ...*sql.NullInt64) predicate.FieldType {
+func NullInt64In(vs ...*sql.Null[int64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldIn(FieldNullInt64, vs...))
 }
 
 // NullInt64NotIn applies the NotIn predicate on the "null_int64" field.
-func NullInt64NotIn(vs ...*sql.NullInt64) predicate.FieldType {
+func NullInt64NotIn(vs ...*sql.Null[int64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNotIn(FieldNullInt64, vs...))
 }
 
 // NullInt64GT applies the GT predicate on the "null_int64" field.
-func NullInt64GT(v *sql.NullInt64) predicate.FieldType {
+func NullInt64GT(v *sql.Null[int64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGT(FieldNullInt64, v))
 }
 
 // NullInt64GTE applies the GTE predicate on the "null_int64" field.
-func NullInt64GTE(v *sql.NullInt64) predicate.FieldType {
+func NullInt64GTE(v *sql.Null[int64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGTE(FieldNullInt64, v))
 }
 
 // NullInt64LT applies the LT predicate on the "null_int64" field.
-func NullInt64LT(v *sql.NullInt64) predicate.FieldType {
+func NullInt64LT(v *sql.Null[int64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLT(FieldNullInt64, v))
 }
 
 // NullInt64LTE applies the LTE predicate on the "null_int64" field.
-func NullInt64LTE(v *sql.NullInt64) predicate.FieldType {
+func NullInt64LTE(v *sql.Null[int64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLTE(FieldNullInt64, v))
 }
 
@@ -3280,42 +3280,42 @@ func SchemaFloat32NotNil() predicate.FieldType {
 }
 
 // NullFloatEQ applies the EQ predicate on the "null_float" field.
-func NullFloatEQ(v *sql.NullFloat64) predicate.FieldType {
+func NullFloatEQ(v *sql.Null[float64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldEQ(FieldNullFloat, v))
 }
 
 // NullFloatNEQ applies the NEQ predicate on the "null_float" field.
-func NullFloatNEQ(v *sql.NullFloat64) predicate.FieldType {
+func NullFloatNEQ(v *sql.Null[float64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNEQ(FieldNullFloat, v))
 }
 
 // NullFloatIn applies the In predicate on the "null_float" field.
-func NullFloatIn(vs ...*sql.NullFloat64) predicate.FieldType {
+func NullFloatIn(vs ...*sql.Null[float64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldIn(FieldNullFloat, vs...))
 }
 
 // NullFloatNotIn applies the NotIn predicate on the "null_float" field.
-func NullFloatNotIn(vs ...*sql.NullFloat64) predicate.FieldType {
+func NullFloatNotIn(vs ...*sql.Null[float64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldNotIn(FieldNullFloat, vs...))
 }
 
 // NullFloatGT applies the GT predicate on the "null_float" field.
-func NullFloatGT(v *sql.NullFloat64) predicate.FieldType {
+func NullFloatGT(v *sql.Null[float64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGT(FieldNullFloat, v))
 }
 
 // NullFloatGTE applies the GTE predicate on the "null_float" field.
-func NullFloatGTE(v *sql.NullFloat64) predicate.FieldType {
+func NullFloatGTE(v *sql.Null[float64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldGTE(FieldNullFloat, v))
 }
 
 // NullFloatLT applies the LT predicate on the "null_float" field.
-func NullFloatLT(v *sql.NullFloat64) predicate.FieldType {
+func NullFloatLT(v *sql.Null[float64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLT(FieldNullFloat, v))
 }
 
 // NullFloatLTE applies the LTE predicate on the "null_float" field.
-func NullFloatLTE(v *sql.NullFloat64) predicate.FieldType {
+func NullFloatLTE(v *sql.Null[float64]) predicate.FieldType {
 	return predicate.FieldType(sql.FieldLTE(FieldNullFloat, v))
 }
 

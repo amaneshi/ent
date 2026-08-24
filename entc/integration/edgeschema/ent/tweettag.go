@@ -10,13 +10,13 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/edgeschema/ent/tag"
 	"entgo.io/ent/entc/integration/edgeschema/ent/tweet"
 	"entgo.io/ent/entc/integration/edgeschema/ent/tweettag"
-	"github.com/google/uuid"
 )
 
 // TweetTag is the model entity for the TweetTag schema.
@@ -75,11 +75,11 @@ func (*TweetTag) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case tweettag.FieldTagID, tweettag.FieldTweetID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case tweettag.FieldAddedAt:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		case tweettag.FieldID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -96,28 +96,28 @@ func (_m *TweetTag) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case tweettag.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				_m.ID = *value
+			} else if value.Valid {
+				_m.ID = uuid.UUID(value.V)
 			}
 		case tweettag.FieldAddedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field added_at", values[i])
 			} else if value.Valid {
-				_m.AddedAt = value.Time
+				_m.AddedAt = time.Time(value.V)
 			}
 		case tweettag.FieldTagID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field tag_id", values[i])
 			} else if value.Valid {
-				_m.TagID = int(value.Int64)
+				_m.TagID = int(value.V)
 			}
 		case tweettag.FieldTweetID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field tweet_id", values[i])
 			} else if value.Valid {
-				_m.TweetID = int(value.Int64)
+				_m.TweetID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

@@ -69,11 +69,11 @@ func (*File) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case file.FieldDeleted:
-			values[i] = new(sql.NullBool)
+			values[i] = new(sql.Null[bool])
 		case file.FieldID, file.FieldParentID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case file.FieldName:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -90,28 +90,28 @@ func (_m *File) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case file.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case file.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.Name = string(value.V)
 			}
 		case file.FieldDeleted:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*sql.Null[bool]); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted", values[i])
 			} else if value.Valid {
-				_m.Deleted = value.Bool
+				_m.Deleted = bool(value.V)
 			}
 		case file.FieldParentID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
 			} else if value.Valid {
-				_m.ParentID = int(value.Int64)
+				_m.ParentID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

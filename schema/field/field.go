@@ -90,7 +90,7 @@ func JSON(name string, typ any) *jsonBuilder {
 	b.desc.goType(typ)
 	b.desc.checkGoType(t)
 	switch t.Kind() {
-	case reflect.Slice, reflect.Array, reflect.Ptr, reflect.Map:
+	case reflect.Slice, reflect.Array, reflect.Pointer, reflect.Map:
 		b.desc.Info.Nillable = true
 		b.desc.Info.PkgPath = pkgPath(t)
 	}
@@ -149,7 +149,7 @@ func Enum(name string) *enumBuilder {
 
 // UUID returns a new Field with type UUID. An example for defining UUID field is as follows:
 //
-//	field.UUID("id", uuid.New())
+//	field.UUID("id")
 func UUID(name string) *uuidBuilder {
 	return &uuidBuilder{&Descriptor{
 		Name: name,
@@ -448,7 +448,7 @@ func (b *timeBuilder) Default(fn any) *timeBuilder {
 //
 //	field.Time("deleted_at").
 //		Optional().
-//		GoType(&sql.NullTime{}).
+//		GoType(&sql.Null[time.Time]{}).
 //		UpdateDefault(NewNullTime),
 func (b *timeBuilder) UpdateDefault(fn any) *timeBuilder {
 	b.desc.UpdateDefault = fn
@@ -468,7 +468,7 @@ func (b *timeBuilder) StorageKey(key string) *timeBuilder {
 // be used.
 //
 //	field.Time("deleted_at").
-//		GoType(&sql.NullTime{})
+//		GoType(&sql.Null[time.Time]{})
 func (b *timeBuilder) GoType(typ any) *timeBuilder {
 	b.desc.goType(typ)
 	return b
@@ -581,7 +581,7 @@ func (b *boolBuilder) StorageKey(key string) *boolBuilder {
 // be used.
 //
 //	field.Bool("deleted").
-//		GoType(&sql.NullBool{})
+//		GoType(&sql.Null[bool]{}),
 func (b *boolBuilder) GoType(typ any) *boolBuilder {
 	b.desc.goType(typ)
 	return b
@@ -1014,7 +1014,7 @@ func sb[T sliceType](name string) *sliceBuilder[T] {
 	b.desc.goType(typ)
 	b.desc.checkGoType(t)
 	switch t.Kind() {
-	case reflect.Slice, reflect.Array, reflect.Ptr, reflect.Map:
+	case reflect.Slice, reflect.Array, reflect.Pointer, reflect.Map:
 		b.desc.Info.Nillable = true
 		b.desc.Info.PkgPath = pkgPath(t)
 	}
@@ -1244,6 +1244,18 @@ func (b *uuidBuilder) SchemaType(types map[string]string) *uuidBuilder {
 	return b
 }
 
+// GoType overrides the default Go type with a custom one.
+// If the provided type implements the Validator interface
+// and no validators have been set, the type validator will
+// be used.
+//
+//	field.UUID("deleted_at").
+//		GoType(&uuid.UUID{})
+func (b *uuidBuilder) GoType(typ any) *uuidBuilder {
+	b.desc.goType(typ)
+	return b
+}
+
 // Annotations adds a list of annotations to the field object to be used by
 // codegen extensions.
 //
@@ -1454,7 +1466,7 @@ func (d *Descriptor) goType(typ any) {
 	}
 	methods(t, info.RType)
 	switch t.Kind() {
-	case reflect.Slice, reflect.Ptr, reflect.Map:
+	case reflect.Slice, reflect.Pointer, reflect.Map:
 		info.Nillable = true
 	}
 	d.Info = info
@@ -1465,7 +1477,7 @@ func (d *Descriptor) checkGoType(expectType reflect.Type) {
 	if d.Info.RType != nil && d.Info.RType.rtype != nil {
 		t = d.Info.RType.rtype
 	}
-	switch pt := reflect.PtrTo(t); {
+	switch pt := reflect.PointerTo(t); {
 	// An external ValueScanner.
 	case d.ValueScanner != nil:
 		vs := reflect.Indirect(reflect.ValueOf(d.ValueScanner)).Type()
@@ -1494,11 +1506,11 @@ func (d *Descriptor) checkGoType(expectType reflect.Type) {
 // pkgName returns the package name from a Go
 // identifier with a package qualifier.
 func pkgName(ident string) string {
-	i := strings.LastIndexByte(ident, '.')
-	if i == -1 {
+	before, _, ok := strings.Cut(ident, ".")
+	if !ok {
 		return ""
 	}
-	s := ident[:i]
+	s := before
 	if i := strings.LastIndexAny(s, "]*"); i != -1 {
 		s = s[i+1:]
 	}
@@ -1508,11 +1520,11 @@ func pkgName(ident string) string {
 func methods(t reflect.Type, rtype *RType) {
 	// For type T, add methods with
 	// pointer receiver as well (*T).
-	if t.Kind() != reflect.Ptr {
-		t = reflect.PtrTo(t)
+	if t.Kind() != reflect.Pointer {
+		t = reflect.PointerTo(t)
 	}
 	n := t.NumMethod()
-	for i := 0; i < n; i++ {
+	for i := range n {
 		m := t.Method(i)
 		in := make([]*RType, m.Type.NumIn()-1)
 		for j := range in {
@@ -1574,7 +1586,7 @@ type TypeValueScanner[T any] interface {
 	Value(T) (driver.Value, error)
 	// ScanValue returns a new ValueScanner that functions as an
 	// intermediate result between database value and GoType value.
-	// For example, sql.NullString or sql.NullInt.
+	// For example, sql.Null[string] or sql.Null[int].
 	ScanValue() ValueScanner
 	// FromValue returns the field instance from the ScanValue
 	// above after the database value was scanned.
@@ -1596,18 +1608,18 @@ func (TextValueScanner[T]) Value(v T) (driver.Value, error) {
 
 // ScanValue implements the TypeValueScanner.ScanValue method.
 func (TextValueScanner[T]) ScanValue() ValueScanner {
-	return &sql.NullString{}
+	return &sql.Null[string]{}
 }
 
 // FromValue implements the TypeValueScanner.FromValue method.
 func (TextValueScanner[T]) FromValue(v driver.Value) (tv T, err error) {
-	s, ok := v.(*sql.NullString)
+	s, ok := v.(*sql.Null[string])
 	if !ok {
 		return tv, fmt.Errorf("unexpected input for FromValue: %T", v)
 	}
 	tv = newT(tv).(T)
 	if s.Valid {
-		err = tv.UnmarshalText([]byte(s.String))
+		err = tv.UnmarshalText([]byte(s.V))
 	}
 	return tv, err
 }
@@ -1627,18 +1639,18 @@ func (BinaryValueScanner[T]) Value(v T) (driver.Value, error) {
 
 // ScanValue implements the TypeValueScanner.ScanValue method.
 func (BinaryValueScanner[T]) ScanValue() ValueScanner {
-	return &sql.NullString{}
+	return &sql.Null[string]{}
 }
 
 // FromValue implements the TypeValueScanner.FromValue method.
 func (BinaryValueScanner[T]) FromValue(v driver.Value) (tv T, err error) {
-	s, ok := v.(*sql.NullString)
+	s, ok := v.(*sql.Null[string])
 	if !ok {
 		return tv, fmt.Errorf("unexpected input for FromValue: %T", v)
 	}
 	tv = newT(tv).(T)
 	if s.Valid {
-		err = tv.UnmarshalBinary([]byte(s.String))
+		err = tv.UnmarshalBinary([]byte(s.V))
 	}
 	return tv, err
 }
@@ -1671,7 +1683,7 @@ func (f ValueScannerFunc[T, S]) FromValue(v driver.Value) (tv T, err error) {
 
 // newT ensures the type is initialized.
 func newT(t any) any {
-	if rt := reflect.TypeOf(t); rt.Kind() == reflect.Ptr {
+	if rt := reflect.TypeOf(t); rt.Kind() == reflect.Pointer {
 		return reflect.New(rt.Elem()).Interface()
 	}
 	return t
@@ -1685,7 +1697,7 @@ type Validator interface {
 
 // indirect returns the type at the end of indirection.
 func indirect(t reflect.Type) reflect.Type {
-	for t.Kind() == reflect.Ptr {
+	for t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
 	return t
@@ -1697,7 +1709,7 @@ func pkgPath(t reflect.Type) string {
 		return pkg
 	}
 	switch t.Kind() {
-	case reflect.Slice, reflect.Array, reflect.Ptr, reflect.Map:
+	case reflect.Slice, reflect.Array, reflect.Pointer, reflect.Map:
 		return pkgPath(t.Elem())
 	}
 	return pkg

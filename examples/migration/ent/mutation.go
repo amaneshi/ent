@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/examples/migration/ent/card"
@@ -20,7 +21,6 @@ import (
 	"entgo.io/ent/examples/migration/ent/session"
 	"entgo.io/ent/examples/migration/ent/sessiondevice"
 	"entgo.io/ent/examples/migration/ent/user"
-	"github.com/google/uuid"
 )
 
 const (

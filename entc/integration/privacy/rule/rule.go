@@ -115,7 +115,7 @@ func FilterUsesDep() privacy.QueryRule {
 			return privacy.Denyf("unexpected filter type %T", f)
 		}
 		// Access the dependency after the type is resolved.
-		_ = u.HTTPClient
+		_ = u.WhereName
 		return privacy.Skip
 	})
 }

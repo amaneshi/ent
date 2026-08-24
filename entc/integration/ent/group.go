@@ -101,15 +101,15 @@ func (*Group) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case group.FieldActive:
-			values[i] = new(sql.NullBool)
+			values[i] = new(sql.Null[bool])
 		case group.FieldID, group.FieldMaxUsers:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case group.FieldType, group.FieldName:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case group.FieldExpire:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		case group.ForeignKeys[0]: // group_info
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -126,48 +126,48 @@ func (_m *Group) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case group.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case group.FieldActive:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*sql.Null[bool]); !ok {
 				return fmt.Errorf("unexpected type %T for field active", values[i])
 			} else if value.Valid {
-				_m.Active = value.Bool
+				_m.Active = bool(value.V)
 			}
 		case group.FieldExpire:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field expire", values[i])
 			} else if value.Valid {
-				_m.Expire = value.Time
+				_m.Expire = time.Time(value.V)
 			}
 		case group.FieldType:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				_m.Type = new(string)
-				*_m.Type = value.String
+				*_m.Type = string(value.V)
 			}
 		case group.FieldMaxUsers:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field max_users", values[i])
 			} else if value.Valid {
-				_m.MaxUsers = int(value.Int64)
+				_m.MaxUsers = int(value.V)
 			}
 		case group.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.Name = string(value.V)
 			}
 		case group.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field group_info", value)
 			} else if value.Valid {
 				_m.group_info = new(int)
-				*_m.group_info = int(value.Int64)
+				*_m.group_info = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

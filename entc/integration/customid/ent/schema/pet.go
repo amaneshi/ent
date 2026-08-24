@@ -5,10 +5,11 @@
 package schema
 
 import (
+	"uuid"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // Pet holds the schema definition for the Pet entity.
@@ -24,7 +25,7 @@ func (Pet) Fields() []ent.Field {
 			NotEmpty().
 			Unique().
 			Immutable().
-			DefaultFunc(uuid.NewString),
+			DefaultFunc(func() string { return uuid.New().String() }),
 	}
 }
 

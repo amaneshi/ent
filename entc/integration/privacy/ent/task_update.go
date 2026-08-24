@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -18,7 +19,6 @@ import (
 	"entgo.io/ent/entc/integration/privacy/ent/team"
 	"entgo.io/ent/entc/integration/privacy/ent/user"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // TaskUpdate is the builder for updating Task entities.

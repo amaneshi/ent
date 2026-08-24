@@ -118,13 +118,13 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		case user.FieldBlob:
 			values[i] = new([]byte)
 		case user.FieldID, user.FieldAge:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case user.FieldName, user.FieldDescription, user.FieldNickname, user.FieldAddress, user.FieldRenamed, user.FieldOldToken, user.FieldState, user.FieldStatus, user.FieldWorkplace, user.FieldDropOptional:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case user.ForeignKeys[0]: // user_children
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case user.ForeignKeys[1]: // user_spouse
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -141,52 +141,52 @@ func (_m *User) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case user.FieldAge:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field age", values[i])
 			} else if value.Valid {
-				_m.Age = int32(value.Int64)
+				_m.Age = int32(value.V)
 			}
 		case user.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.Name = string(value.V)
 			}
 		case user.FieldDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				_m.Description = value.String
+				_m.Description = string(value.V)
 			}
 		case user.FieldNickname:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field nickname", values[i])
 			} else if value.Valid {
-				_m.Nickname = value.String
+				_m.Nickname = string(value.V)
 			}
 		case user.FieldAddress:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field address", values[i])
 			} else if value.Valid {
-				_m.Address = value.String
+				_m.Address = string(value.V)
 			}
 		case user.FieldRenamed:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field renamed", values[i])
 			} else if value.Valid {
-				_m.Renamed = value.String
+				_m.Renamed = string(value.V)
 			}
 		case user.FieldOldToken:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field old_token", values[i])
 			} else if value.Valid {
-				_m.OldToken = value.String
+				_m.OldToken = string(value.V)
 			}
 		case user.FieldBlob:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -195,42 +195,42 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				_m.Blob = *value
 			}
 		case user.FieldState:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field state", values[i])
 			} else if value.Valid {
-				_m.State = user.State(value.String)
+				_m.State = user.State(value.V)
 			}
 		case user.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				_m.Status = value.String
+				_m.Status = string(value.V)
 			}
 		case user.FieldWorkplace:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field workplace", values[i])
 			} else if value.Valid {
-				_m.Workplace = value.String
+				_m.Workplace = string(value.V)
 			}
 		case user.FieldDropOptional:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field drop_optional", values[i])
 			} else if value.Valid {
-				_m.DropOptional = value.String
+				_m.DropOptional = string(value.V)
 			}
 		case user.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_children", value)
 			} else if value.Valid {
 				_m.user_children = new(int)
-				*_m.user_children = int(value.Int64)
+				*_m.user_children = int(value.V)
 			}
 		case user.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_spouse", value)
 			} else if value.Valid {
 				_m.user_spouse = new(int)
-				*_m.user_spouse = int(value.Int64)
+				*_m.user_spouse = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
