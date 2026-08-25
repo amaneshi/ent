@@ -353,6 +353,10 @@ func ScanTypeOf(rows *Rows, i int) any {
 	if rt.Kind() == reflect.Pointer {
 		rt = rt.Elem()
 	}
+	// Postgres and SQLite returns UUID as database column type.
+	if strings.EqualFold(ct[i].DatabaseTypeName(), "UUID") {
+		rt = reflect.TypeFor[sql.Null[uuid.UUID]]()
+	}
 	// Handle NULL values.
 	switch k := rt.Kind(); k {
 	case reflect.Bool:
@@ -367,9 +371,6 @@ func ScanTypeOf(rows *Rows, i int) any {
 	default:
 		if k == reflect.Struct && rt == timeType {
 			rt = reflect.TypeFor[sql.Null[time.Time]]()
-		} else if strings.EqualFold(ct[i].DatabaseTypeName(), "UUID") {
-			// Postgres and SQLite returns dabase type UUID for column.
-			rt = reflect.TypeFor[sql.Null[uuid.UUID]]()
 		}
 	}
 	return reflect.New(rt).Interface()

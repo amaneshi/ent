@@ -3257,13 +3257,9 @@ func (b *Builder) Arg(a any) *Builder {
 		b.Join(v)
 		return b
 	case uuid.UUID:
-		// Go 1.27's database/sql/driver.DefaultParameterConverter handles
-		// uuid.UUID (converts it to its string form), but some drivers
-		// (e.g. go-sql-driver/mysql) use their own converter that does not
-		// support the [16]byte array underlying uuid.UUID. Convert it here,
-		// at the single chokepoint for all args, so every dialect receives
-		// the string representation that matches CHAR(36)/uuid columns.
-		a = v.String()
+		if b.mysql() {
+			a = v.String()
+		}
 	}
 	// Default placeholder param (MySQL and SQLite).
 	format := "?"
@@ -3418,6 +3414,11 @@ func (b Builder) clone() Builder {
 // postgres reports if the builder dialect is PostgreSQL.
 func (b Builder) postgres() bool {
 	return b.Dialect() == dialect.Postgres
+}
+
+// mysql reports if the builder dialect is MySQL.
+func (b Builder) mysql() bool {
+	return b.Dialect() == dialect.MySQL
 }
 
 // sqlite reports if the builder dialect is SQLite.

@@ -24,9 +24,7 @@ linters:
     dupl:
       threshold: 100
     errcheck:
-      exclude-functions:
-        - fmt:.*,Read|Write|Close|Exec
-        - io:Copy
+      exclude-functions: []
     funlen:
       lines: 200
       statements: 200
