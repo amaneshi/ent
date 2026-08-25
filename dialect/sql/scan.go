@@ -368,6 +368,7 @@ func ScanTypeOf(rows *Rows, i int) any {
 		if k == reflect.Struct && rt == timeType {
 			rt = reflect.TypeFor[sql.Null[time.Time]]()
 		} else if strings.EqualFold(ct[i].DatabaseTypeName(), "UUID") {
+			// Postgres and SQLite returns dabase type UUID for column.
 			rt = reflect.TypeFor[sql.Null[uuid.UUID]]()
 		}
 	}
@@ -403,21 +404,41 @@ func (s SelectValues) Get(name string) (any, error) {
 		if rv.Valid {
 			return rv.String, nil
 		}
+	case sql.Null[string]:
+		if rv.Valid {
+			return rv.V, nil
+		}
 	case sql.NullInt64:
 		if rv.Valid {
 			return rv.Int64, nil
+		}
+	case sql.Null[int64]:
+		if rv.Valid {
+			return rv.V, nil
 		}
 	case sql.NullFloat64:
 		if rv.Valid {
 			return rv.Float64, nil
 		}
+	case sql.Null[float64]:
+		if rv.Valid {
+			return rv.V, nil
+		}
 	case sql.NullBool:
 		if rv.Valid {
 			return rv.Bool, nil
 		}
+	case sql.Null[bool]:
+		if rv.Valid {
+			return rv.V, nil
+		}
 	case sql.NullTime:
 		if rv.Valid {
 			return rv.Time, nil
+		}
+	case sql.Null[time.Time]:
+		if rv.Valid {
+			return rv.V, nil
 		}
 	case sql.Null[uuid.UUID]:
 		if rv.Valid {

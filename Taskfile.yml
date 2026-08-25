@@ -34,7 +34,7 @@ tasks:
       - go -C examples test {{.RACE_FLAGS}} ./...
 
   generate:
-    desc: Run go generate and verify no uncommitted changes
+    desc: Run go generate
     cmds:
       - go generate ./... && go mod tidy
       - go -C examples generate ./... && go -C examples mod tidy

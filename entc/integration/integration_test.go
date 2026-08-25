@@ -89,7 +89,7 @@ func TestMySQL(t *testing.T) {
 }
 
 func TestMaria(t *testing.T) {
-	for version, port := range map[string]int{"10.5": 4306, "10.2": 4307, "10.3": 4308} {
+	for version, port := range map[string]int{"10.4": 4306, "10.2": 4307, "10.3": 4308} {
 		addr := net.JoinHostPort("localhost", strconv.Itoa(port))
 		t.Run(version, func(t *testing.T) {
 			t.Parallel()
@@ -833,9 +833,17 @@ func Select(t *testing.T, client *ent.Client) {
 		require.True(!tv.IsZero())
 		u, err := p.Value(as3)
 		require.NoError(err)
-		uu, ok := u.(uuid.UUID)
-		require.True(ok)
-		require.True(uu != uuid.Nil())
+		if strings.Contains(t.Name(), "Postgres") || strings.Contains(t.Name(), "SQLite") {
+			uu, ok := u.(uuid.UUID)
+			require.True(ok)
+			require.True(uu != uuid.Nil())
+		} else {
+			ub, ok := u.([]byte)
+			require.True(ok)
+			uu, err := uuid.Parse(string(ub))
+			require.NoError(err)
+			require.True(uu != uuid.Nil())
+		}
 	}
 
 	// Order by random value should compile a valid query.
