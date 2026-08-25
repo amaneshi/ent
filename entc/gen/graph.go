@@ -181,7 +181,7 @@ func NewGraph(c *Config, schemas ...*load.Schema) (g *Graph, err error) {
 	if c.Storage != nil && c.Storage.Init != nil {
 		check(c.Storage.Init(g), "storage driver init")
 	}
-	if enabled, _ := g.Config.FeatureEnabled(FeatureGlobalID.Name); enabled {
+	if enabled, _ := g.FeatureEnabled(FeatureGlobalID.Name); enabled {
 		if err := IncrementStartAnnotation(g); err != nil {
 			return nil, err
 		}
@@ -246,7 +246,7 @@ func generate(g *Graph) error {
 	)
 	templates, external = g.templates()
 	for _, n := range g.Nodes {
-		assets.addDir(filepath.Join(g.Config.Target, n.PackageDir()))
+		assets.addDir(filepath.Join(g.Target, n.PackageDir()))
 		for _, tmpl := range Templates {
 			if tmpl.Cond != nil && !tmpl.Cond(n) {
 				continue
@@ -255,7 +255,7 @@ func generate(g *Graph) error {
 			if err := templates.ExecuteTemplate(b, tmpl.Name, n); err != nil {
 				return fmt.Errorf("execute template %q: %w", tmpl.Name, err)
 			}
-			assets.add(filepath.Join(g.Config.Target, tmpl.Format(n)), b.Bytes())
+			assets.add(filepath.Join(g.Target, tmpl.Format(n)), b.Bytes())
 		}
 	}
 	for _, tmpl := range append(GraphTemplates, external...) {
@@ -263,13 +263,13 @@ func generate(g *Graph) error {
 			continue
 		}
 		if dir := filepath.Dir(tmpl.Format); dir != "." {
-			assets.addDir(filepath.Join(g.Config.Target, dir))
+			assets.addDir(filepath.Join(g.Target, dir))
 		}
 		b := bytes.NewBuffer(nil)
 		if err := templates.ExecuteTemplate(b, tmpl.Name, g); err != nil {
 			return fmt.Errorf("execute template %q: %w", tmpl.Name, err)
 		}
-		assets.add(filepath.Join(g.Config.Target, tmpl.Format), b.Bytes())
+		assets.add(filepath.Join(g.Target, tmpl.Format), b.Bytes())
 	}
 	for _, f := range allFeatures {
 		if f.cleanup == nil || g.featureEnabled(f) {
@@ -286,7 +286,7 @@ func generate(g *Graph) error {
 	}
 	// Cleanup nodes' assets and old template
 	// files that are not needed anymore.
-	cleanOldNodes(assets, g.Config.Target)
+	cleanOldNodes(assets, g.Target)
 	for _, n := range deletedTemplates {
 		if err := os.Remove(filepath.Join(g.Target, n)); err != nil && !os.IsNotExist(err) {
 			log.Printf("remove old file %s: %s\n", filepath.Join(g.Target, n), err)
@@ -1085,9 +1085,11 @@ func PrepareEnv(c *Config) (undo func() error, err error) {
 	if len(fi.Imports) == 0 {
 		return nop, nil
 	}
+	//nolint:gosec // False positive
 	if err := os.WriteFile(path, append([]byte("// +build tools\n"), out...), 0644); err != nil {
 		return nil, err
 	}
+	//nolint:gosec // False positive
 	return func() error { return os.WriteFile(path, out, 0644) }, nil
 }
 

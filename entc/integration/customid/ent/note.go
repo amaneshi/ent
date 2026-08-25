@@ -67,9 +67,9 @@ func (*Note) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case note.FieldID, note.FieldText:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case note.ForeignKeys[0]: // note_children
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -86,23 +86,23 @@ func (_m *Note) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case note.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				_m.ID = schema.NoteID(value.String)
+				_m.ID = schema.NoteID(value.V)
 			}
 		case note.FieldText:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field text", values[i])
 			} else if value.Valid {
-				_m.Text = value.String
+				_m.Text = string(value.V)
 			}
 		case note.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field note_children", values[i])
 			} else if value.Valid {
 				_m.note_children = new(schema.NoteID)
-				*_m.note_children = schema.NoteID(value.String)
+				*_m.note_children = schema.NoteID(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

@@ -183,7 +183,7 @@ func ResolveIncrementStartsConflict(dir string) error {
 			fixed = append(fixed, l)
 		}
 	}
-	return os.WriteFile(p, bytes.Join(fixed, []byte("\n")), fi.Mode())
+	return os.WriteFile(p, bytes.Join(fixed, []byte("\n")), fi.Mode()) //nolint:gosec // False positive
 }
 
 func ToMap(a *entsql.Annotation) (map[string]any, error) {

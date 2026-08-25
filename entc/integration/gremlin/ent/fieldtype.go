@@ -13,12 +13,12 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/gremlin"
 	"entgo.io/ent/entc/integration/ent/role"
 	"entgo.io/ent/entc/integration/ent/schema"
 	"entgo.io/ent/entc/integration/gremlin/ent/fieldtype"
-	"github.com/google/uuid"
 )
 
 // FieldType is the model entity for the FieldType schema.
@@ -99,9 +99,9 @@ type FieldType struct {
 	// Ndir holds the value of the "ndir" field.
 	Ndir *http.Dir `json:"ndir,omitempty"`
 	// Str holds the value of the "str" field.
-	Str sql.NullString `json:"str,omitempty"`
+	Str sql.Null[string] `json:"str,omitempty"`
 	// NullStr holds the value of the "null_str" field.
-	NullStr *sql.NullString `json:"null_str,omitempty"`
+	NullStr *sql.Null[string] `json:"null_str,omitempty"`
 	// Link holds the value of the "link" field.
 	Link schema.Link `json:"link,omitempty"`
 	// NullLink holds the value of the "null_link" field.
@@ -111,9 +111,9 @@ type FieldType struct {
 	// NullActive holds the value of the "null_active" field.
 	NullActive *schema.Status `json:"null_active,omitempty"`
 	// Deleted holds the value of the "deleted" field.
-	Deleted *sql.NullBool `json:"deleted,omitempty"`
+	Deleted *sql.Null[bool] `json:"deleted,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
-	DeletedAt *sql.NullTime `json:"deleted_at,omitempty"`
+	DeletedAt *sql.Null[time.Time] `json:"deleted_at,omitempty"`
 	// RawData holds the value of the "raw_data" field.
 	RawData []byte `json:"raw_data,omitempty"`
 	// Sensitive holds the value of the "sensitive" field.
@@ -121,7 +121,7 @@ type FieldType struct {
 	// IP holds the value of the "ip" field.
 	IP net.IP `json:"ip,omitempty"`
 	// NullInt64 holds the value of the "null_int64" field.
-	NullInt64 *sql.NullInt64 `json:"null_int64,omitempty"`
+	NullInt64 *sql.Null[int64] `json:"null_int64,omitempty"`
 	// SchemaInt holds the value of the "schema_int" field.
 	SchemaInt schema.Int `json:"schema_int,omitempty"`
 	// SchemaInt8 holds the value of the "schema_int8" field.
@@ -133,7 +133,7 @@ type FieldType struct {
 	// SchemaFloat32 holds the value of the "schema_float32" field.
 	SchemaFloat32 schema.Float32 `json:"schema_float32,omitempty"`
 	// NullFloat holds the value of the "null_float" field.
-	NullFloat *sql.NullFloat64 `json:"null_float,omitempty"`
+	NullFloat *sql.Null[float64] `json:"null_float,omitempty"`
 	// Role holds the value of the "role" field.
 	Role role.Role `json:"role,omitempty"`
 	// Priority holds the value of the "priority" field.
@@ -202,24 +202,24 @@ func (_m *FieldType) FromResponse(res *gremlin.Response) error {
 		Duration              time.Duration         `json:"duration,omitempty"`
 		Dir                   http.Dir              `json:"dir,omitempty"`
 		Ndir                  *http.Dir             `json:"ndir,omitempty"`
-		Str                   sql.NullString        `json:"str,omitempty"`
-		NullStr               *sql.NullString       `json:"null_str,omitempty"`
+		Str                   sql.Null[string]      `json:"str,omitempty"`
+		NullStr               *sql.Null[string]     `json:"null_str,omitempty"`
 		Link                  schema.Link           `json:"link,omitempty"`
 		NullLink              *schema.Link          `json:"null_link,omitempty"`
 		Active                schema.Status         `json:"active,omitempty"`
 		NullActive            *schema.Status        `json:"null_active,omitempty"`
-		Deleted               *sql.NullBool         `json:"deleted,omitempty"`
-		DeletedAt             *sql.NullTime         `json:"deleted_at,omitempty"`
+		Deleted               *sql.Null[bool]       `json:"deleted,omitempty"`
+		DeletedAt             *sql.Null[time.Time]  `json:"deleted_at,omitempty"`
 		RawData               []byte                `json:"raw_data,omitempty"`
 		Sensitive             []byte                `json:"sensitive,omitempty"`
 		IP                    net.IP                `json:"ip,omitempty"`
-		NullInt64             *sql.NullInt64        `json:"null_int64,omitempty"`
+		NullInt64             *sql.Null[int64]      `json:"null_int64,omitempty"`
 		SchemaInt             schema.Int            `json:"schema_int,omitempty"`
 		SchemaInt8            schema.Int8           `json:"schema_int8,omitempty"`
 		SchemaInt64           schema.Int64          `json:"schema_int64,omitempty"`
 		SchemaFloat           schema.Float64        `json:"schema_float,omitempty"`
 		SchemaFloat32         schema.Float32        `json:"schema_float32,omitempty"`
-		NullFloat             *sql.NullFloat64      `json:"null_float,omitempty"`
+		NullFloat             *sql.Null[float64]    `json:"null_float,omitempty"`
 		Role                  role.Role             `json:"role,omitempty"`
 		Priority              role.Priority         `json:"priority,omitempty"`
 		OptionalUUID          uuid.UUID             `json:"optional_uuid,omitempty"`
@@ -595,24 +595,24 @@ func (_m *FieldTypes) FromResponse(res *gremlin.Response) error {
 		Duration              time.Duration         `json:"duration,omitempty"`
 		Dir                   http.Dir              `json:"dir,omitempty"`
 		Ndir                  *http.Dir             `json:"ndir,omitempty"`
-		Str                   sql.NullString        `json:"str,omitempty"`
-		NullStr               *sql.NullString       `json:"null_str,omitempty"`
+		Str                   sql.Null[string]      `json:"str,omitempty"`
+		NullStr               *sql.Null[string]     `json:"null_str,omitempty"`
 		Link                  schema.Link           `json:"link,omitempty"`
 		NullLink              *schema.Link          `json:"null_link,omitempty"`
 		Active                schema.Status         `json:"active,omitempty"`
 		NullActive            *schema.Status        `json:"null_active,omitempty"`
-		Deleted               *sql.NullBool         `json:"deleted,omitempty"`
-		DeletedAt             *sql.NullTime         `json:"deleted_at,omitempty"`
+		Deleted               *sql.Null[bool]       `json:"deleted,omitempty"`
+		DeletedAt             *sql.Null[time.Time]  `json:"deleted_at,omitempty"`
 		RawData               []byte                `json:"raw_data,omitempty"`
 		Sensitive             []byte                `json:"sensitive,omitempty"`
 		IP                    net.IP                `json:"ip,omitempty"`
-		NullInt64             *sql.NullInt64        `json:"null_int64,omitempty"`
+		NullInt64             *sql.Null[int64]      `json:"null_int64,omitempty"`
 		SchemaInt             schema.Int            `json:"schema_int,omitempty"`
 		SchemaInt8            schema.Int8           `json:"schema_int8,omitempty"`
 		SchemaInt64           schema.Int64          `json:"schema_int64,omitempty"`
 		SchemaFloat           schema.Float64        `json:"schema_float,omitempty"`
 		SchemaFloat32         schema.Float32        `json:"schema_float32,omitempty"`
-		NullFloat             *sql.NullFloat64      `json:"null_float,omitempty"`
+		NullFloat             *sql.Null[float64]    `json:"null_float,omitempty"`
 		Role                  role.Role             `json:"role,omitempty"`
 		Priority              role.Priority         `json:"priority,omitempty"`
 		OptionalUUID          uuid.UUID             `json:"optional_uuid,omitempty"`

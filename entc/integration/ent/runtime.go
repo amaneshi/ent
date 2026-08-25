@@ -126,11 +126,11 @@ func init() {
 	// fieldtypeDescStr is the schema descriptor for str field.
 	fieldtypeDescStr := fieldtypeFields[36].Descriptor()
 	// fieldtype.DefaultStr holds the default value on creation for the str field.
-	fieldtype.DefaultStr = fieldtypeDescStr.Default.(func() sql.NullString)
+	fieldtype.DefaultStr = fieldtypeDescStr.Default.(func() sql.Null[string])
 	// fieldtypeDescNullStr is the schema descriptor for null_str field.
 	fieldtypeDescNullStr := fieldtypeFields[37].Descriptor()
 	// fieldtype.DefaultNullStr holds the default value on creation for the null_str field.
-	fieldtype.DefaultNullStr = fieldtypeDescNullStr.Default.(func() *sql.NullString)
+	fieldtype.DefaultNullStr = fieldtypeDescNullStr.Default.(func() *sql.Null[string])
 	// fieldtypeDescLink is the schema descriptor for link field.
 	fieldtypeDescLink := fieldtypeFields[38].Descriptor()
 	// fieldtype.LinkValidator is a validator for the "link" field. It is called by the builders before save.
@@ -138,9 +138,9 @@ func init() {
 	// fieldtypeDescDeletedAt is the schema descriptor for deleted_at field.
 	fieldtypeDescDeletedAt := fieldtypeFields[43].Descriptor()
 	// fieldtype.DefaultDeletedAt holds the default value on creation for the deleted_at field.
-	fieldtype.DefaultDeletedAt = fieldtypeDescDeletedAt.Default.(func() *sql.NullTime)
+	fieldtype.DefaultDeletedAt = fieldtypeDescDeletedAt.Default.(func() *sql.Null[time.Time])
 	// fieldtype.UpdateDefaultDeletedAt holds the default value on update for the deleted_at field.
-	fieldtype.UpdateDefaultDeletedAt = fieldtypeDescDeletedAt.UpdateDefault.(func() *sql.NullTime)
+	fieldtype.UpdateDefaultDeletedAt = fieldtypeDescDeletedAt.UpdateDefault.(func() *sql.Null[time.Time])
 	// fieldtypeDescRawData is the schema descriptor for raw_data field.
 	fieldtypeDescRawData := fieldtypeFields[44].Descriptor()
 	// fieldtype.RawDataValidator is a validator for the "raw_data" field. It is called by the builders before save.

@@ -12,10 +12,10 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/entc/integration/edgefield/ent/migrate"
-	"github.com/google/uuid"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"

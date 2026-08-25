@@ -21,8 +21,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/ent/role"
 	"entgo.io/ent/schema/field"
-
-	"github.com/google/uuid"
 )
 
 // FieldType holds the schema definition for the FieldType entity.
@@ -176,16 +174,16 @@ func (FieldType) Fields() []ent.Field { //nolint:funlen
 			GoType(http.Dir("ndir")),
 		field.String("str").
 			Optional().
-			GoType(sql.NullString{}).
-			DefaultFunc(func() sql.NullString {
-				return sql.NullString{String: "default", Valid: true}
+			GoType(sql.Null[string]{}).
+			DefaultFunc(func() sql.Null[string] {
+				return sql.Null[string]{V: "default", Valid: true}
 			}),
 		field.String("null_str").
 			Optional().
 			Nillable().
-			GoType(&sql.NullString{}).
-			DefaultFunc(func() *sql.NullString {
-				return &sql.NullString{String: "default", Valid: true}
+			GoType(&sql.Null[string]{}).
+			DefaultFunc(func() *sql.Null[string] {
+				return &sql.Null[string]{V: "default", Valid: true}
 			}),
 		field.String("link").
 			Optional().
@@ -205,15 +203,15 @@ func (FieldType) Fields() []ent.Field { //nolint:funlen
 		field.Bool("deleted").
 			Optional().
 			Nillable().
-			GoType(&sql.NullBool{}),
+			GoType(&sql.Null[bool]{}),
 		field.Time("deleted_at").
 			Optional().
-			GoType(&sql.NullTime{}).
-			Default(func() *sql.NullTime {
-				return &sql.NullTime{Time: time.Now(), Valid: true}
+			GoType(&sql.Null[time.Time]{}).
+			Default(func() *sql.Null[time.Time] {
+				return &sql.Null[time.Time]{V: time.Now(), Valid: true}
 			}).
-			UpdateDefault(func() *sql.NullTime {
-				return &sql.NullTime{Time: time.Now(), Valid: true}
+			UpdateDefault(func() *sql.Null[time.Time] {
+				return &sql.Null[time.Time]{V: time.Now(), Valid: true}
 			}),
 		field.Bytes("raw_data").
 			Optional().
@@ -236,7 +234,7 @@ func (FieldType) Fields() []ent.Field { //nolint:funlen
 			}),
 		field.Int("null_int64").
 			Optional().
-			GoType(&sql.NullInt64{}),
+			GoType(&sql.Null[int64]{}),
 		field.Int("schema_int").
 			Optional().
 			GoType(Int(0)),
@@ -254,16 +252,16 @@ func (FieldType) Fields() []ent.Field { //nolint:funlen
 			GoType(Float32(0)),
 		field.Float("null_float").
 			Optional().
-			GoType(&sql.NullFloat64{}),
+			GoType(&sql.Null[float64]{}),
 		field.Enum("role").
 			Default(string(role.Read)).
 			GoType(role.Role("role")),
 		field.Enum("priority").
 			Optional().
 			GoType(role.Priority(0)),
-		field.UUID("optional_uuid", uuid.UUID{}).
+		field.UUID("optional_uuid").
 			Optional(),
-		field.UUID("nillable_uuid", uuid.UUID{}).
+		field.UUID("nillable_uuid").
 			Optional().
 			Nillable(),
 		field.Strings("strings").
@@ -512,7 +510,7 @@ func NewBigInt(i int64) BigInt {
 }
 
 func (b *BigInt) Scan(src any) error {
-	var i sql.NullString
+	var i sql.Null[string]
 	if err := i.Scan(src); err != nil {
 		return err
 	}
@@ -523,13 +521,13 @@ func (b *BigInt) Scan(src any) error {
 		b.Int = big.NewInt(0)
 	}
 	// Value came in a floating point format.
-	if strings.ContainsAny(i.String, ".+e") {
+	if strings.ContainsAny(i.V, ".+e") {
 		f := big.NewFloat(0)
-		if _, err := fmt.Sscan(i.String, f); err != nil {
+		if _, err := fmt.Sscan(i.V, f); err != nil {
 			return err
 		}
 		b.Int, _ = f.Int(b.Int)
-	} else if _, err := fmt.Sscan(i.String, b.Int); err != nil {
+	} else if _, err := fmt.Sscan(i.V, b.Int); err != nil {
 		return err
 	}
 	return nil

@@ -137,5 +137,5 @@ func (p Config) node(t *gen.Type) {
 			return
 		}
 	}
-	io.WriteString(p, strings.ReplaceAll(b.String(), "\n", "\n\t")+"\n")
+	_, _ = io.WriteString(p, strings.ReplaceAll(b.String(), "\n", "\n\t")+"\n")
 }

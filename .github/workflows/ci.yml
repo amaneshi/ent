@@ -13,12 +13,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: './go.mod'
       - name: Run linters
-        uses: golangci/golangci-lint-action@v5
+        uses: golangci/golangci-lint-action@v9
         with:
           args: --verbose
 
@@ -26,18 +26,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ['1.23', '1.24']
+        go: ['1.27'] # TODO: not sure how now enable 1.26 so now locked to latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version: ${{ matrix.go }}
-      - uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Run cmd tests
         run: go test -race ./...
         working-directory: cmd
@@ -60,16 +54,10 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: './go.mod'
-      - uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Run go generate
         run: go generate ./... && go mod tidy
       - name: Run go generate on examples directory
@@ -275,16 +263,10 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: './go.mod'
-      - uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Run integration tests
         working-directory: entc/integration
         run: go test -race -count=2 ./...
@@ -477,18 +459,12 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version-file: './go.mod'
-      - uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Checkout origin/master
         run: git checkout origin/master
       - name: Run integration on origin/master

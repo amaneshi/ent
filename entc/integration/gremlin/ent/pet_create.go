@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/gremlin"
 	"entgo.io/ent/dialect/gremlin/graph/dsl"
@@ -18,7 +19,6 @@ import (
 	"entgo.io/ent/dialect/gremlin/graph/dsl/p"
 	"entgo.io/ent/entc/integration/gremlin/ent/pet"
 	"entgo.io/ent/entc/integration/gremlin/ent/user"
-	"github.com/google/uuid"
 )
 
 // PetCreate is the builder for creating a Pet entity.

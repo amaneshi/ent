@@ -10,13 +10,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"uuid"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/entc/integration/customid/ent/mixinid"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // MixinIDCreate is the builder for creating a MixinID entity.
@@ -117,10 +117,14 @@ func (_c *MixinIDCreate) sqlSave(ctx context.Context) (*MixinID, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(uuid.UUID); ok {
+			_node.ID = id
+		} else {
+			var nid sql.Null[uuid.UUID]
+			if err := nid.Scan(_spec.ID.Value); err != nil {
+				return nil, err
+			}
+			_node.ID = uuid.UUID(nid.V)
 		}
 	}
 	_c.mutation.id = &_node.ID
@@ -136,7 +140,7 @@ func (_c *MixinIDCreate) createSpec() (*MixinID, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.SomeField(); ok {
 		_spec.SetField(mixinid.FieldSomeField, field.TypeString, value)

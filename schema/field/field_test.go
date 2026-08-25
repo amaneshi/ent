@@ -20,6 +20,7 @@ import (
 	"strconv"
 	"testing"
 	"time"
+	stduuid "uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -83,11 +84,11 @@ func TestInt(t *testing.T) {
 	assert.False(t, fd.Info.Nillable)
 	assert.False(t, fd.Info.ValueScanner())
 
-	fd = field.Int("count").GoType(&sql.NullInt64{}).Descriptor()
+	fd = field.Int("count").GoType(&sql.Null[int64]{}).Descriptor()
 	assert.NoError(t, fd.Err)
-	assert.Equal(t, "*sql.NullInt64", fd.Info.Ident)
+	assert.Equal(t, "*sql.Null[int64]", fd.Info.Ident)
 	assert.Equal(t, "database/sql", fd.Info.PkgPath)
-	assert.Equal(t, "*sql.NullInt64", fd.Info.String())
+	assert.Equal(t, "*sql.Null[int64]", fd.Info.String())
 	assert.True(t, fd.Info.Nillable)
 	assert.True(t, fd.Info.ValueScanner())
 
@@ -141,11 +142,11 @@ func TestFloat(t *testing.T) {
 	assert.False(t, fd.Info.Nillable)
 	assert.False(t, fd.Info.ValueScanner())
 
-	fd = field.Float("count").GoType(&sql.NullFloat64{}).Descriptor()
+	fd = field.Float("count").GoType(&sql.Null[float64]{}).Descriptor()
 	assert.NoError(t, fd.Err)
-	assert.Equal(t, "*sql.NullFloat64", fd.Info.Ident)
+	assert.Equal(t, "*sql.Null[float64]", fd.Info.Ident)
 	assert.Equal(t, "database/sql", fd.Info.PkgPath)
-	assert.Equal(t, "*sql.NullFloat64", fd.Info.String())
+	assert.Equal(t, "*sql.Null[float64]", fd.Info.String())
 	assert.True(t, fd.Info.Nillable)
 	assert.True(t, fd.Info.ValueScanner())
 
@@ -199,11 +200,11 @@ func TestBool(t *testing.T) {
 	assert.False(t, fd.Info.Nillable)
 	assert.False(t, fd.Info.ValueScanner())
 
-	fd = field.Bool("deleted").GoType(&sql.NullBool{}).Descriptor()
+	fd = field.Bool("deleted").GoType(&sql.Null[bool]{}).Descriptor()
 	assert.NoError(t, fd.Err)
-	assert.Equal(t, "*sql.NullBool", fd.Info.Ident)
+	assert.Equal(t, "*sql.Null[bool]", fd.Info.Ident)
 	assert.Equal(t, "database/sql", fd.Info.PkgPath)
-	assert.Equal(t, "*sql.NullBool", fd.Info.String())
+	assert.Equal(t, "*sql.Null[bool]", fd.Info.String())
 	assert.True(t, fd.Info.Nillable)
 	assert.True(t, fd.Info.ValueScanner())
 
@@ -248,11 +249,11 @@ func TestBytes(t *testing.T) {
 	assert.True(t, fd.Info.Nillable)
 	assert.False(t, fd.Info.ValueScanner())
 
-	fd = field.Bytes("blob").GoType(sql.NullString{}).Descriptor()
+	fd = field.Bytes("blob").GoType(sql.Null[string]{}).Descriptor()
 	assert.NoError(t, fd.Err)
-	assert.Equal(t, "sql.NullString", fd.Info.Ident)
+	assert.Equal(t, "sql.Null[string]", fd.Info.Ident)
 	assert.Equal(t, "database/sql", fd.Info.PkgPath)
-	assert.Equal(t, "sql.NullString", fd.Info.String())
+	assert.Equal(t, "sql.Null[string]", fd.Info.String())
 	assert.False(t, fd.Info.Nillable)
 	assert.True(t, fd.Info.ValueScanner())
 
@@ -378,8 +379,8 @@ func TestString_DefaultFunc(t *testing.T) {
 	fd = field.String("dir").GoType(http.Dir("/tmp")).DefaultFunc(f2).Descriptor()
 	assert.Error(t, fd.Err, "`var _ http.Dir = f2()` should fail")
 
-	f3 := func() sql.NullString { return sql.NullString{} }
-	fd = field.String("str").GoType(sql.NullString{}).DefaultFunc(f3).Descriptor()
+	f3 := func() sql.Null[string] { return sql.Null[string]{} }
+	fd = field.String("str").GoType(sql.Null[string]{}).DefaultFunc(f3).Descriptor()
 	assert.NoError(t, fd.Err)
 
 	type S string
@@ -393,15 +394,15 @@ func TestString_DefaultFunc(t *testing.T) {
 
 func TestString_ValueScanner(t *testing.T) {
 	fd := field.String("dir").
-		ValueScanner(field.ValueScannerFunc[string, *sql.NullString]{
+		ValueScanner(field.ValueScannerFunc[string, *sql.Null[string]]{
 			V: func(s string) (driver.Value, error) {
 				return base64.StdEncoding.EncodeToString([]byte(s)), nil
 			},
-			S: func(ns *sql.NullString) (string, error) {
+			S: func(ns *sql.Null[string]) (string, error) {
 				if !ns.Valid {
 					return "", nil
 				}
-				b, err := base64.StdEncoding.DecodeString(ns.String)
+				b, err := base64.StdEncoding.DecodeString(ns.V)
 				if err != nil {
 					return "", err
 				}
@@ -514,15 +515,15 @@ func TestString(t *testing.T) {
 	assert.Equal(t, "string", fd.Info.String())
 	assert.False(t, fd.Info.Nillable)
 
-	fd = field.String("nullable_name").GoType(&sql.NullString{}).Descriptor()
+	fd = field.String("nullable_name").GoType(&sql.Null[string]{}).Descriptor()
 	assert.NoError(t, fd.Err)
-	assert.Equal(t, "*sql.NullString", fd.Info.Ident)
+	assert.Equal(t, "*sql.Null[string]", fd.Info.Ident)
 	assert.Equal(t, "database/sql", fd.Info.PkgPath)
-	assert.Equal(t, "*sql.NullString", fd.Info.String())
+	assert.Equal(t, "*sql.Null[string]", fd.Info.String())
 	assert.True(t, fd.Info.Nillable)
 	assert.True(t, fd.Info.ValueScanner())
 	assert.False(t, fd.Info.Stringer())
-	assert.True(t, fd.Info.RType.TypeEqual(reflect.TypeOf(&sql.NullString{})))
+	assert.True(t, fd.Info.RType.TypeEqual(reflect.TypeFor[*sql.Null[string]]()))
 
 	fd = field.String("nullable_name").GoType(VString("")).Descriptor()
 	assert.True(t, fd.Info.Valuer())
@@ -581,11 +582,11 @@ func TestTime(t *testing.T) {
 	assert.False(t, fd.Info.Nillable)
 	assert.False(t, fd.Info.ValueScanner())
 
-	fd = field.Time("deleted_at").GoType(&sql.NullTime{}).Descriptor()
+	fd = field.Time("deleted_at").GoType(&sql.Null[time.Time]{}).Descriptor()
 	assert.NoError(t, fd.Err)
-	assert.Equal(t, "*sql.NullTime", fd.Info.Ident)
+	assert.Equal(t, "*sql.Null[time.Time]", fd.Info.Ident)
 	assert.Equal(t, "database/sql", fd.Info.PkgPath)
-	assert.Equal(t, "*sql.NullTime", fd.Info.String())
+	assert.Equal(t, "*sql.Null[time.Time]", fd.Info.String())
 	assert.True(t, fd.Info.Nillable)
 	assert.True(t, fd.Info.ValueScanner())
 	assert.Equal(t, "sql", fd.Info.PkgName)
@@ -795,29 +796,57 @@ func TestField_Enums(t *testing.T) {
 }
 
 func TestField_UUID(t *testing.T) {
-	fd := field.UUID("id", uuid.UUID{}).
+	fd := field.UUID("id").
 		Unique().
-		Default(uuid.New).
 		Comment("comment").
 		Nillable().
 		Descriptor()
 	assert.Equal(t, "id", fd.Name)
 	assert.True(t, fd.Unique)
 	assert.Equal(t, "uuid.UUID", fd.Info.String())
-	assert.Equal(t, "github.com/google/uuid", fd.Info.PkgPath)
-	assert.NotNil(t, fd.Default)
-	assert.NotEmpty(t, fd.Default.(func() uuid.UUID)())
+	assert.Equal(t, "uuid", fd.Info.PkgPath)
 	assert.Equal(t, "comment", fd.Comment)
 	assert.True(t, fd.Nillable)
 
-	fd = field.UUID("id", &uuid.UUID{}).
+	fd = field.UUID("id").
 		Descriptor()
-	assert.Equal(t, "github.com/google/uuid", fd.Info.PkgPath)
+	assert.Equal(t, "uuid", fd.Info.PkgPath)
 
-	fd = field.UUID("id", uuid.UUID{}).
-		Default(uuid.UUID{}).
-		Descriptor()
-	assert.EqualError(t, fd.Err, "expect type (func() uuid.UUID) for uuid default value")
+	type UUID uuid.UUID
+	fd = field.UUID("id").GoType(UUID{}).Default(func() UUID { return UUID{} }).Descriptor()
+	assert.NoError(t, fd.Err)
+	assert.Equal(t, "field_test.UUID", fd.Info.Ident)
+	assert.Equal(t, "entgo.io/ent/schema/field_test", fd.Info.PkgPath)
+	assert.Equal(t, "field_test.UUID", fd.Info.String())
+	assert.False(t, fd.Info.Nillable)
+	assert.False(t, fd.Info.ValueScanner())
+
+	fd = field.UUID("id").GoType(uuid.UUID{}).Descriptor()
+	assert.NoError(t, fd.Err)
+	assert.Equal(t, "uuid.UUID", fd.Info.Ident)
+	assert.Equal(t, "github.com/google/uuid", fd.Info.PkgPath)
+	assert.Equal(t, "uuid.UUID", fd.Info.String())
+	assert.False(t, fd.Info.Nillable)
+	assert.True(t, fd.Info.ValueScanner())
+	assert.Equal(t, "uuid", fd.Info.PkgName)
+
+	fd = field.UUID("id").GoType(&sql.Null[stduuid.UUID]{}).Descriptor()
+	assert.NoError(t, fd.Err)
+	assert.Equal(t, "*sql.Null[uuid.UUID]", fd.Info.Ident)
+	assert.Equal(t, "database/sql", fd.Info.PkgPath)
+	assert.Equal(t, "*sql.Null[uuid.UUID]", fd.Info.String())
+	assert.True(t, fd.Info.Nillable)
+	assert.True(t, fd.Info.ValueScanner())
+	assert.Equal(t, "sql", fd.Info.PkgName)
+
+	fd = field.UUID("id").GoType(UUID{}).Default(stduuid.New).Descriptor()
+	assert.Error(t, fd.Err)
+	fd = field.UUID("id").GoType(1).Descriptor()
+	assert.Error(t, fd.Err)
+	fd = field.UUID("id").GoType(struct{}{}).Descriptor()
+	assert.Error(t, fd.Err)
+	fd = field.UUID("id").GoType(new(UUID)).Descriptor()
+	assert.Error(t, fd.Err)
 }
 
 type custom struct {

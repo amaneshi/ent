@@ -10,12 +10,12 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/ent/pet"
 	"entgo.io/ent/entc/integration/ent/user"
-	"github.com/google/uuid"
 )
 
 // Pet is the model entity for the Pet schema.
@@ -82,21 +82,21 @@ func (*Pet) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case pet.FieldTrained:
-			values[i] = new(sql.NullBool)
+			values[i] = new(sql.Null[bool])
 		case pet.FieldAge:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.Null[float64])
 		case pet.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case pet.FieldName, pet.FieldNickname:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case pet.FieldOptionalTime:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		case pet.FieldUUID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		case pet.ForeignKeys[0]: // user_pets
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case pet.ForeignKeys[1]: // user_team
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -113,60 +113,60 @@ func (_m *Pet) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case pet.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case pet.FieldAge:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.Null[float64]); !ok {
 				return fmt.Errorf("unexpected type %T for field age", values[i])
 			} else if value.Valid {
-				_m.Age = value.Float64
+				_m.Age = float64(value.V)
 			}
 		case pet.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.Name = string(value.V)
 			}
 		case pet.FieldUUID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field uuid", values[i])
-			} else if value != nil {
-				_m.UUID = *value
+			} else if value.Valid {
+				_m.UUID = uuid.UUID(value.V)
 			}
 		case pet.FieldNickname:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field nickname", values[i])
 			} else if value.Valid {
-				_m.Nickname = value.String
+				_m.Nickname = string(value.V)
 			}
 		case pet.FieldTrained:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*sql.Null[bool]); !ok {
 				return fmt.Errorf("unexpected type %T for field trained", values[i])
 			} else if value.Valid {
-				_m.Trained = value.Bool
+				_m.Trained = bool(value.V)
 			}
 		case pet.FieldOptionalTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field optional_time", values[i])
 			} else if value.Valid {
-				_m.OptionalTime = value.Time
+				_m.OptionalTime = time.Time(value.V)
 			}
 		case pet.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_pets", value)
 			} else if value.Valid {
 				_m.user_pets = new(int)
-				*_m.user_pets = int(value.Int64)
+				*_m.user_pets = int(value.V)
 			}
 		case pet.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_team", value)
 			} else if value.Valid {
 				_m.user_team = new(int)
-				*_m.user_team = int(value.Int64)
+				*_m.user_team = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

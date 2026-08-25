@@ -14,6 +14,7 @@ import (
 	"net"
 	"net/http"
 	"time"
+	"uuid"
 
 	"entgo.io/ent/dialect/gremlin"
 	"entgo.io/ent/dialect/gremlin/graph/dsl"
@@ -21,7 +22,6 @@ import (
 	"entgo.io/ent/entc/integration/ent/role"
 	"entgo.io/ent/entc/integration/ent/schema"
 	"entgo.io/ent/entc/integration/gremlin/ent/fieldtype"
-	"github.com/google/uuid"
 )
 
 // FieldTypeCreate is the builder for creating a FieldType entity.
@@ -472,13 +472,13 @@ func (_c *FieldTypeCreate) SetNillableNdir(v *http.Dir) *FieldTypeCreate {
 }
 
 // SetStr sets the "str" field.
-func (_c *FieldTypeCreate) SetStr(v sql.NullString) *FieldTypeCreate {
+func (_c *FieldTypeCreate) SetStr(v sql.Null[string]) *FieldTypeCreate {
 	_c.mutation.SetStr(v)
 	return _c
 }
 
 // SetNillableStr sets the "str" field if the given value is not nil.
-func (_c *FieldTypeCreate) SetNillableStr(v *sql.NullString) *FieldTypeCreate {
+func (_c *FieldTypeCreate) SetNillableStr(v *sql.Null[string]) *FieldTypeCreate {
 	if v != nil {
 		_c.SetStr(*v)
 	}
@@ -486,7 +486,7 @@ func (_c *FieldTypeCreate) SetNillableStr(v *sql.NullString) *FieldTypeCreate {
 }
 
 // SetNullStr sets the "null_str" field.
-func (_c *FieldTypeCreate) SetNullStr(v *sql.NullString) *FieldTypeCreate {
+func (_c *FieldTypeCreate) SetNullStr(v *sql.Null[string]) *FieldTypeCreate {
 	_c.mutation.SetNullStr(v)
 	return _c
 }
@@ -540,13 +540,13 @@ func (_c *FieldTypeCreate) SetNillableNullActive(v *schema.Status) *FieldTypeCre
 }
 
 // SetDeleted sets the "deleted" field.
-func (_c *FieldTypeCreate) SetDeleted(v *sql.NullBool) *FieldTypeCreate {
+func (_c *FieldTypeCreate) SetDeleted(v *sql.Null[bool]) *FieldTypeCreate {
 	_c.mutation.SetDeleted(v)
 	return _c
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (_c *FieldTypeCreate) SetDeletedAt(v *sql.NullTime) *FieldTypeCreate {
+func (_c *FieldTypeCreate) SetDeletedAt(v *sql.Null[time.Time]) *FieldTypeCreate {
 	_c.mutation.SetDeletedAt(v)
 	return _c
 }
@@ -570,7 +570,7 @@ func (_c *FieldTypeCreate) SetIP(v net.IP) *FieldTypeCreate {
 }
 
 // SetNullInt64 sets the "null_int64" field.
-func (_c *FieldTypeCreate) SetNullInt64(v *sql.NullInt64) *FieldTypeCreate {
+func (_c *FieldTypeCreate) SetNullInt64(v *sql.Null[int64]) *FieldTypeCreate {
 	_c.mutation.SetNullInt64(v)
 	return _c
 }
@@ -646,7 +646,7 @@ func (_c *FieldTypeCreate) SetNillableSchemaFloat32(v *schema.Float32) *FieldTyp
 }
 
 // SetNullFloat sets the "null_float" field.
-func (_c *FieldTypeCreate) SetNullFloat(v *sql.NullFloat64) *FieldTypeCreate {
+func (_c *FieldTypeCreate) SetNullFloat(v *sql.Null[float64]) *FieldTypeCreate {
 	_c.mutation.SetNullFloat(v)
 	return _c
 }

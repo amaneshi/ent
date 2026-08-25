@@ -13,13 +13,13 @@ import (
 	"net"
 	"net/http"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/gremlin/graph/dsl"
 	"entgo.io/ent/entc/integration/ent/role"
 	"entgo.io/ent/entc/integration/ent/schema"
 	"entgo.io/ent/entc/integration/gremlin/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // Mutation represents an operation that mutates the FieldType nodes in the graph.
@@ -87,18 +87,18 @@ type Mutation struct {
 	addduration                *time.Duration
 	dir                        *http.Dir
 	ndir                       *http.Dir
-	str                        *sql.NullString
-	null_str                   **sql.NullString
+	str                        *sql.Null[string]
+	null_str                   **sql.Null[string]
 	link                       *schema.Link
 	null_link                  **schema.Link
 	active                     *schema.Status
 	null_active                *schema.Status
-	deleted                    **sql.NullBool
-	deleted_at                 **sql.NullTime
+	deleted                    **sql.Null[bool]
+	deleted_at                 **sql.Null[time.Time]
 	raw_data                   *[]byte
 	sensitive                  *[]byte
 	ip                         *net.IP
-	null_int64                 **sql.NullInt64
+	null_int64                 **sql.Null[int64]
 	schema_int                 *schema.Int
 	addschema_int              *schema.Int
 	schema_int8                *schema.Int8
@@ -109,7 +109,7 @@ type Mutation struct {
 	addschema_float            *schema.Float64
 	schema_float32             *schema.Float32
 	addschema_float32          *schema.Float32
-	null_float                 **sql.NullFloat64
+	null_float                 **sql.Null[float64]
 	role                       *role.Role
 	priority                   *role.Priority
 	optional_uuid              *uuid.UUID
@@ -1736,12 +1736,12 @@ func (m *Mutation) ResetNdir() {
 }
 
 // SetStr sets the "str" field.
-func (m *Mutation) SetStr(ss sql.NullString) {
-	m.str = &ss
+func (m *Mutation) SetStr(s sql.Null[string]) {
+	m.str = &s
 }
 
 // Str returns the value of the "str" field in the mutation.
-func (m *Mutation) Str() (r sql.NullString, exists bool) {
+func (m *Mutation) Str() (r sql.Null[string], exists bool) {
 	v := m.str
 	if v == nil {
 		return
@@ -1768,12 +1768,12 @@ func (m *Mutation) ResetStr() {
 }
 
 // SetNullStr sets the "null_str" field.
-func (m *Mutation) SetNullStr(ss *sql.NullString) {
-	m.null_str = &ss
+func (m *Mutation) SetNullStr(s *sql.Null[string]) {
+	m.null_str = &s
 }
 
 // NullStr returns the value of the "null_str" field in the mutation.
-func (m *Mutation) NullStr() (r *sql.NullString, exists bool) {
+func (m *Mutation) NullStr() (r *sql.Null[string], exists bool) {
 	v := m.null_str
 	if v == nil {
 		return
@@ -1928,12 +1928,12 @@ func (m *Mutation) ResetNullActive() {
 }
 
 // SetDeleted sets the "deleted" field.
-func (m *Mutation) SetDeleted(sb *sql.NullBool) {
-	m.deleted = &sb
+func (m *Mutation) SetDeleted(s *sql.Null[bool]) {
+	m.deleted = &s
 }
 
 // Deleted returns the value of the "deleted" field in the mutation.
-func (m *Mutation) Deleted() (r *sql.NullBool, exists bool) {
+func (m *Mutation) Deleted() (r *sql.Null[bool], exists bool) {
 	v := m.deleted
 	if v == nil {
 		return
@@ -1960,12 +1960,12 @@ func (m *Mutation) ResetDeleted() {
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (m *Mutation) SetDeletedAt(st *sql.NullTime) {
-	m.deleted_at = &st
+func (m *Mutation) SetDeletedAt(s *sql.Null[time.Time]) {
+	m.deleted_at = &s
 }
 
 // DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *Mutation) DeletedAt() (r *sql.NullTime, exists bool) {
+func (m *Mutation) DeletedAt() (r *sql.Null[time.Time], exists bool) {
 	v := m.deleted_at
 	if v == nil {
 		return
@@ -2088,12 +2088,12 @@ func (m *Mutation) ResetIP() {
 }
 
 // SetNullInt64 sets the "null_int64" field.
-func (m *Mutation) SetNullInt64(si *sql.NullInt64) {
-	m.null_int64 = &si
+func (m *Mutation) SetNullInt64(s *sql.Null[int64]) {
+	m.null_int64 = &s
 }
 
 // NullInt64 returns the value of the "null_int64" field in the mutation.
-func (m *Mutation) NullInt64() (r *sql.NullInt64, exists bool) {
+func (m *Mutation) NullInt64() (r *sql.Null[int64], exists bool) {
 	v := m.null_int64
 	if v == nil {
 		return
@@ -2385,12 +2385,12 @@ func (m *Mutation) ResetSchemaFloat32() {
 }
 
 // SetNullFloat sets the "null_float" field.
-func (m *Mutation) SetNullFloat(sf *sql.NullFloat64) {
-	m.null_float = &sf
+func (m *Mutation) SetNullFloat(s *sql.Null[float64]) {
+	m.null_float = &s
 }
 
 // NullFloat returns the value of the "null_float" field in the mutation.
-func (m *Mutation) NullFloat() (r *sql.NullFloat64, exists bool) {
+func (m *Mutation) NullFloat() (r *sql.Null[float64], exists bool) {
 	v := m.null_float
 	if v == nil {
 		return
@@ -3390,14 +3390,14 @@ func (m *Mutation) SetField(name string, value ent.Value) error {
 		m.SetNdir(v)
 		return nil
 	case FieldStr:
-		v, ok := value.(sql.NullString)
+		v, ok := value.(sql.Null[string])
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStr(v)
 		return nil
 	case FieldNullStr:
-		v, ok := value.(*sql.NullString)
+		v, ok := value.(*sql.Null[string])
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3432,14 +3432,14 @@ func (m *Mutation) SetField(name string, value ent.Value) error {
 		m.SetNullActive(v)
 		return nil
 	case FieldDeleted:
-		v, ok := value.(*sql.NullBool)
+		v, ok := value.(*sql.Null[bool])
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeleted(v)
 		return nil
 	case FieldDeletedAt:
-		v, ok := value.(*sql.NullTime)
+		v, ok := value.(*sql.Null[time.Time])
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3467,7 +3467,7 @@ func (m *Mutation) SetField(name string, value ent.Value) error {
 		m.SetIP(v)
 		return nil
 	case FieldNullInt64:
-		v, ok := value.(*sql.NullInt64)
+		v, ok := value.(*sql.Null[int64])
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3509,7 +3509,7 @@ func (m *Mutation) SetField(name string, value ent.Value) error {
 		m.SetSchemaFloat32(v)
 		return nil
 	case FieldNullFloat:
-		v, ok := value.(*sql.NullFloat64)
+		v, ok := value.(*sql.Null[float64])
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

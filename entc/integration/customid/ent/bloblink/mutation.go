@@ -11,11 +11,11 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/customid/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // Mutation represents an operation that mutates the BlobLink nodes in the graph.

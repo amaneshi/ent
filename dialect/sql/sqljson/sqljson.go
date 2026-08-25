@@ -610,8 +610,8 @@ func ParsePath(dotpath string) ([]string, error) {
 		path []string
 	)
 	for i < len(dotpath) {
-		switch r := dotpath[i]; {
-		case r == '"':
+		switch dotpath[i] {
+		case '"':
 			if i == len(dotpath)-1 {
 				return nil, fmt.Errorf("unexpected quote")
 			}
@@ -620,7 +620,7 @@ func ParsePath(dotpath string) ([]string, error) {
 				return nil, fmt.Errorf("unbalanced quote")
 			}
 			i += idx + 2
-		case r == '[':
+		case '[':
 			if p != i {
 				path = append(path, dotpath[p:i])
 			}
@@ -636,7 +636,7 @@ func ParsePath(dotpath string) ([]string, error) {
 				return nil, fmt.Errorf("invalid index %q", dotpath[i:i+idx+1])
 			}
 			i += idx + 1
-		case r == '.' || r == ']':
+		case '.', ']':
 			if p != i {
 				path = append(path, dotpath[p:i])
 			}

@@ -10,11 +10,11 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/examples/migration/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // Mutation represents an operation that mutates the Session nodes in the graph.

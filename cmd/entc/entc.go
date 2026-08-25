@@ -37,5 +37,6 @@ func migrate(c *gen.Config) {
 	if err != nil || !bytes.Contains(buf, oldCmd) {
 		return
 	}
+	//nolint:gosec // False positive
 	_ = os.WriteFile(target, bytes.ReplaceAll(buf, oldCmd, []byte("entgo.io/ent/cmd/ent")), 0644)
 }

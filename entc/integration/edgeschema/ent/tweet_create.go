@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"uuid"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -19,7 +20,6 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/user"
 	"entgo.io/ent/entc/integration/edgeschema/ent/usertweet"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // TweetCreate is the builder for creating a Tweet entity.

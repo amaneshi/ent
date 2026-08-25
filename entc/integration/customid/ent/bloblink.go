@@ -10,12 +10,12 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/customid/ent/blob"
 	"entgo.io/ent/entc/integration/customid/ent/bloblink"
-	"github.com/google/uuid"
 )
 
 // BlobLink is the model entity for the BlobLink schema.
@@ -72,9 +72,9 @@ func (*BlobLink) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case bloblink.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		case bloblink.FieldBlobID, bloblink.FieldLinkID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -91,22 +91,22 @@ func (_m *BlobLink) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case bloblink.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				_m.CreatedAt = value.Time
+				_m.CreatedAt = time.Time(value.V)
 			}
 		case bloblink.FieldBlobID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field blob_id", values[i])
-			} else if value != nil {
-				_m.BlobID = *value
+			} else if value.Valid {
+				_m.BlobID = uuid.UUID(value.V)
 			}
 		case bloblink.FieldLinkID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field link_id", values[i])
-			} else if value != nil {
-				_m.LinkID = *value
+			} else if value.Valid {
+				_m.LinkID = uuid.UUID(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

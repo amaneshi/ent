@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -17,7 +18,6 @@ import (
 	"entgo.io/ent/entc/integration/customid/ent/blob"
 	"entgo.io/ent/entc/integration/customid/ent/bloblink"
 	"entgo.io/ent/entc/integration/customid/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // BlobLinkQuery is the builder for querying BlobLink entities.

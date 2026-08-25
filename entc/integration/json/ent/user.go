@@ -8,6 +8,7 @@ package ent
 
 import (
 	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -31,7 +32,7 @@ type User struct {
 	// URLs holds the value of the "URLs" field.
 	URLs []*url.URL `json:"urls,omitempty"`
 	// Raw holds the value of the "raw" field.
-	Raw json.RawMessage `json:"raw,omitempty"`
+	Raw jsontext.Value `json:"raw,omitempty"`
 	// Dirs holds the value of the "dirs" field.
 	Dirs []http.Dir `json:"dirs,omitempty"`
 	// Ints holds the value of the "ints" field.
@@ -61,7 +62,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		case user.FieldT, user.FieldURL, user.FieldURLs, user.FieldRaw, user.FieldDirs, user.FieldInts, user.FieldFloats, user.FieldStrings, user.FieldIntsValidate, user.FieldFloatsValidate, user.FieldStringsValidate, user.FieldAddr, user.FieldUnknown:
 			values[i] = new([]byte)
 		case user.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -78,11 +79,11 @@ func (_m *User) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case user.FieldT:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field t", values[i])

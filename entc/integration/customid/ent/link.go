@@ -10,19 +10,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/customid/ent/link"
 	"entgo.io/ent/entc/integration/customid/ent/schema"
-	uuidc "entgo.io/ent/entc/integration/customid/uuidcompatible"
 )
 
 // Link is the model entity for the Link schema.
 type Link struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuidc.UUIDC `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// LinkInformation holds the value of the "link_information" field.
 	LinkInformation map[string]schema.LinkInformation `json:"link_information,omitempty"`
 	selectValues    sql.SelectValues
@@ -36,7 +36,7 @@ func (*Link) scanValues(columns []string) ([]any, error) {
 		case link.FieldLinkInformation:
 			values[i] = new([]byte)
 		case link.FieldID:
-			values[i] = new(uuidc.UUIDC)
+			values[i] = new(sql.Null[uuid.UUID])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -53,10 +53,10 @@ func (_m *Link) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case link.FieldID:
-			if value, ok := values[i].(*uuidc.UUIDC); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				_m.ID = *value
+			} else if value.Valid {
+				_m.ID = uuid.UUID(value.V)
 			}
 		case link.FieldLinkInformation:
 			if value, ok := values[i].(*[]byte); !ok {

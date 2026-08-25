@@ -13,9 +13,12 @@ import (
 	"go/types"
 	"path"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
+	"time"
 	"unicode"
+	"uuid"
 
 	"ariga.io/atlas/sql/postgres"
 	"entgo.io/ent"
@@ -1408,16 +1411,18 @@ func (f Field) ScanType() string {
 	case field.TypeJSON, field.TypeBytes:
 		return "[]byte"
 	case field.TypeString, field.TypeEnum:
-		return "sql.NullString"
+		return "sql.Null[string]"
 	case field.TypeBool:
-		return "sql.NullBool"
+		return "sql.Null[bool]"
 	case field.TypeTime:
-		return "sql.NullTime"
+		return "sql.Null[time.Time]"
+	case field.TypeUUID:
+		return "sql.Null[uuid.UUID]"
 	case field.TypeInt, field.TypeInt8, field.TypeInt16, field.TypeInt32, field.TypeInt64,
 		field.TypeUint, field.TypeUint8, field.TypeUint16, field.TypeUint32, field.TypeUint64:
-		return "sql.NullInt64"
+		return "sql.Null[int64]"
 	case field.TypeFloat32, field.TypeFloat64:
-		return "sql.NullFloat64"
+		return "sql.Null[float64]"
 	}
 	return f.Type.String()
 }
@@ -1492,16 +1497,18 @@ func (f Field) NewScanType() string {
 	case field.TypeJSON, field.TypeBytes:
 		expr = "[]byte"
 	case field.TypeString, field.TypeEnum:
-		expr = "sql.NullString"
+		expr = "sql.Null[string]"
 	case field.TypeBool:
-		expr = "sql.NullBool"
+		expr = "sql.Null[bool]"
 	case field.TypeTime:
-		expr = "sql.NullTime"
+		expr = "sql.Null[time.Time]"
+	case field.TypeUUID:
+		expr = "sql.Null[uuid.UUID]"
 	case field.TypeInt, field.TypeInt8, field.TypeInt16, field.TypeInt32, field.TypeInt64,
 		field.TypeUint, field.TypeUint8, field.TypeUint16, field.TypeUint32, field.TypeUint64:
-		expr = "sql.NullInt64"
+		expr = "sql.Null[int64]"
 	case field.TypeFloat32, field.TypeFloat64:
-		expr = "sql.NullFloat64"
+		expr = "sql.Null[float64]"
 	}
 	return fmt.Sprintf("new(%s)", expr)
 }
@@ -1521,23 +1528,21 @@ func (f Field) ScanTypeField(rec string) string {
 	}
 	switch f.Type.Type {
 	case field.TypeEnum:
-		expr = fmt.Sprintf("%s(%s.String)", f.Type, rec)
-	case field.TypeString, field.TypeBool, field.TypeInt64, field.TypeFloat64:
-		expr = f.goType(fmt.Sprintf("%s.%s", rec, strings.Title(f.Type.Type.String())))
-	case field.TypeTime:
-		expr = fmt.Sprintf("%s.Time", rec)
+		expr = fmt.Sprintf("%s(%s.V)", f.Type, rec)
+	case field.TypeString, field.TypeBool, field.TypeInt64, field.TypeFloat64, field.TypeTime, field.TypeUUID:
+		expr = fmt.Sprintf("%s(%s.V)", f.Type, rec)
 	case field.TypeFloat32:
-		expr = fmt.Sprintf("%s(%s.Float64)", f.Type, rec)
+		expr = fmt.Sprintf("%s(%s.V)", f.Type, rec)
 	case field.TypeInt, field.TypeInt8, field.TypeInt16, field.TypeInt32,
 		field.TypeUint, field.TypeUint8, field.TypeUint16, field.TypeUint32, field.TypeUint64:
-		expr = fmt.Sprintf("%s(%s.Int64)", f.Type, rec)
+		expr = fmt.Sprintf("%s(%s.V)", f.Type, rec)
 	}
 	return expr
 }
 
 // standardNullType reports if the field is one of the standard SQL types.
 func (f Field) standardNullType() bool {
-	for _, t := range []reflect.Type{
+	return slices.ContainsFunc([]reflect.Type{
 		nullBoolType,
 		nullBoolPType,
 		nullFloatType,
@@ -1550,12 +1555,9 @@ func (f Field) standardNullType() bool {
 		nullTimePType,
 		nullStringType,
 		nullStringPType,
-	} {
-		if f.Type.RType.TypeEqual(t) {
-			return true
-		}
-	}
-	return false
+		nullUUIDType,
+		nullUUIDPType,
+	}, f.Type.RType.TypeEqual)
 }
 
 // Column returns the table column. It sets it as a primary key (auto_increment)
@@ -1776,18 +1778,20 @@ func (f Field) SupportsMutationAppend() bool {
 }
 
 var (
-	nullBoolType    = reflect.TypeOf(sql.NullBool{})
-	nullBoolPType   = reflect.TypeOf((*sql.NullBool)(nil))
-	nullFloatType   = reflect.TypeOf(sql.NullFloat64{})
-	nullFloatPType  = reflect.TypeOf((*sql.NullFloat64)(nil))
-	nullInt32Type   = reflect.TypeOf(sql.NullInt32{})
-	nullInt32PType  = reflect.TypeOf((*sql.NullInt32)(nil))
-	nullInt64Type   = reflect.TypeOf(sql.NullInt64{})
-	nullInt64PType  = reflect.TypeOf((*sql.NullInt64)(nil))
-	nullTimeType    = reflect.TypeOf(sql.NullTime{})
-	nullTimePType   = reflect.TypeOf((*sql.NullTime)(nil))
-	nullStringType  = reflect.TypeOf(sql.NullString{})
-	nullStringPType = reflect.TypeOf((*sql.NullString)(nil))
+	nullBoolType    = reflect.TypeFor[sql.Null[bool]]()
+	nullBoolPType   = reflect.TypeFor[*sql.Null[bool]]()
+	nullFloatType   = reflect.TypeFor[sql.Null[float64]]()
+	nullFloatPType  = reflect.TypeFor[*sql.Null[float64]]()
+	nullInt32Type   = reflect.TypeFor[sql.Null[int32]]()
+	nullInt32PType  = reflect.TypeFor[*sql.Null[int32]]()
+	nullInt64Type   = reflect.TypeFor[sql.Null[int64]]()
+	nullInt64PType  = reflect.TypeFor[*sql.Null[int64]]()
+	nullTimeType    = reflect.TypeFor[sql.Null[time.Time]]()
+	nullTimePType   = reflect.TypeFor[*sql.Null[time.Time]]()
+	nullStringType  = reflect.TypeFor[sql.Null[string]]()
+	nullStringPType = reflect.TypeFor[*sql.Null[string]]()
+	nullUUIDType    = reflect.TypeFor[sql.Null[uuid.UUID]]()
+	nullUUIDPType   = reflect.TypeFor[*sql.Null[uuid.UUID]]()
 )
 
 // BasicType returns a Go expression for the given identifier
@@ -1795,7 +1799,7 @@ var (
 //
 //	v (http.Dir)		=> string(v)
 //	v (fmt.Stringer)	=> v.String()
-//	v (sql.NullString)	=> v.String
+//	v (sql.Null[string])	=> v.String
 func (f Field) BasicType(ident string) (expr string) {
 	if !f.HasGoType() {
 		return ident
@@ -1809,20 +1813,25 @@ func (f Field) BasicType(ident string) (expr string) {
 		case rt.Kind == reflect.Bool:
 			expr = fmt.Sprintf("bool(%s)", ident)
 		case rt.TypeEqual(nullBoolType) || rt.TypeEqual(nullBoolPType):
-			expr = fmt.Sprintf("%s.Bool", ident)
+			expr = fmt.Sprintf("%s.V", ident)
 		}
 	case field.TypeBytes:
-		if rt.Kind == reflect.Slice {
+		switch rt.Kind {
+		case reflect.Slice:
 			expr = fmt.Sprintf("[]byte(%s)", ident)
-		} else if rt.Kind == reflect.Array {
+		case reflect.Array:
 			expr = ident + "[:]"
 		}
 	case field.TypeTime:
 		switch {
 		case rt.TypeEqual(nullTimeType) || rt.TypeEqual(nullTimePType):
-			expr = fmt.Sprintf("%s.Time", ident)
+			expr = fmt.Sprintf("%s.V", ident)
 		case rt.Kind == reflect.Struct:
 			expr = fmt.Sprintf("time.Time(%s)", ident)
+		}
+	case field.TypeUUID:
+		if rt.TypeEqual(nullUUIDType) || rt.TypeEqual(nullUUIDPType) {
+			expr = fmt.Sprintf("%s.V", ident)
 		}
 	case field.TypeString:
 		switch {
@@ -1831,7 +1840,7 @@ func (f Field) BasicType(ident string) (expr string) {
 		case t.Stringer():
 			expr = fmt.Sprintf("%s.String()", ident)
 		case rt.TypeEqual(nullStringType) || rt.TypeEqual(nullStringPType):
-			expr = fmt.Sprintf("%s.String", ident)
+			expr = fmt.Sprintf("%s.V", ident)
 		}
 	case field.TypeJSON:
 		expr = ident
@@ -1841,15 +1850,6 @@ func (f Field) BasicType(ident string) (expr string) {
 		}
 	}
 	return expr
-}
-
-// goType returns the Go expression for the given basic-type
-// identifier to covert it to the custom Go type.
-func (f Field) goType(ident string) string {
-	if !f.HasGoType() {
-		return ident
-	}
-	return fmt.Sprintf("%s(%s)", f.Type, ident)
 }
 
 func (f Field) enums(lf *load.Field) ([]Enum, error) {

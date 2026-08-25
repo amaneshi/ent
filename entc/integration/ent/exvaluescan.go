@@ -47,7 +47,7 @@ func (*ExValueScan) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case exvaluescan.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case exvaluescan.FieldBinary:
 			values[i] = exvaluescan.ValueScanner.Binary.ScanValue()
 		case exvaluescan.FieldBinaryBytes:
@@ -80,11 +80,11 @@ func (_m *ExValueScan) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case exvaluescan.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case exvaluescan.FieldBinary:
 			if value, err := exvaluescan.ValueScanner.Binary.FromValue(values[i]); err != nil {
 				return err

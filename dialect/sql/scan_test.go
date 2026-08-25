@@ -9,9 +9,9 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"testing"
+	"uuid"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -87,14 +87,14 @@ func TestScanSlice(t *testing.T) {
 		AddRow(1, nil).
 		AddRow(nil, "a8m")
 	var v6 []struct {
-		Age  NullInt64
-		Name NullString
+		Age  Null[int64]
+		Name Null[string]
 	}
 	require.NoError(t, ScanSlice(toRows(mock), &v6))
-	require.EqualValues(t, 1, v6[0].Age.Int64)
+	require.EqualValues(t, 1, v6[0].Age.V)
 	require.False(t, v6[0].Name.Valid)
 	require.False(t, v6[1].Age.Valid)
-	require.Equal(t, "a8m", v6[1].Name.String)
+	require.Equal(t, "a8m", v6[1].Name.V)
 
 	u1, u2 := uuid.New().String(), uuid.New().String()
 	mock = sqlmock.NewRows([]string{"ids"}).

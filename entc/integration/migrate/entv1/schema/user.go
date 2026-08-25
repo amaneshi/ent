@@ -5,13 +5,14 @@
 package schema
 
 import (
+	"uuid"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"github.com/google/uuid"
 )
 
 // User holds the schema definition for the User entity.
@@ -36,7 +37,7 @@ func (User) Fields() []ent.Field {
 		field.String("renamed").
 			Optional(),
 		field.String("old_token").
-			DefaultFunc(uuid.NewString),
+			DefaultFunc(func() string { return uuid.New().String() }),
 		field.Bytes("blob").
 			Optional().
 			MaxLen(255),

@@ -56,11 +56,11 @@ func (*Car) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case car.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case car.FieldName:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case car.ForeignKeys[0]: // user_car
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -77,23 +77,23 @@ func (_m *Car) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case car.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case car.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.Name = string(value.V)
 			}
 		case car.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_car", value)
 			} else if value.Valid {
 				_m.user_car = new(int)
-				*_m.user_car = int(value.Int64)
+				*_m.user_car = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

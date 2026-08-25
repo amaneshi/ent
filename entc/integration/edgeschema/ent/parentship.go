@@ -73,9 +73,9 @@ func (*Parentship) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case parentship.FieldWeight, parentship.FieldParentID, parentship.FieldChildID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case parentship.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -92,28 +92,28 @@ func (_m *Parentship) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case parentship.FieldWeight:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field weight", values[i])
 			} else if value.Valid {
-				_m.Weight = int(value.Int64)
+				_m.Weight = int(value.V)
 			}
 		case parentship.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				_m.CreatedAt = value.Time
+				_m.CreatedAt = time.Time(value.V)
 			}
 		case parentship.FieldParentID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
 			} else if value.Valid {
-				_m.ParentID = int(value.Int64)
+				_m.ParentID = int(value.V)
 			}
 		case parentship.FieldChildID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field child_id", values[i])
 			} else if value.Valid {
-				_m.ChildID = int(value.Int64)
+				_m.ChildID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

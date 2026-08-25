@@ -59,13 +59,13 @@ func (*Card) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case card.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case card.FieldNumber:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case card.FieldExpired:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		case card.ForeignKeys[0]: // user_card
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -82,29 +82,29 @@ func (_m *Card) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case card.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case card.FieldExpired:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field expired", values[i])
 			} else if value.Valid {
-				_m.Expired = value.Time
+				_m.Expired = time.Time(value.V)
 			}
 		case card.FieldNumber:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field number", values[i])
 			} else if value.Valid {
-				_m.Number = value.String
+				_m.Number = string(value.V)
 			}
 		case card.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_card", value)
 			} else if value.Valid {
 				_m.user_card = new(int)
-				*_m.user_card = int(value.Int64)
+				*_m.user_card = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

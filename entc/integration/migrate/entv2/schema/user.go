@@ -6,6 +6,7 @@ package schema
 
 import (
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -17,7 +18,6 @@ import (
 	"entgo.io/ent/schema/mixin"
 
 	"ariga.io/atlas/sql/postgres"
-	"github.com/google/uuid"
 )
 
 type Mixin struct {
@@ -82,7 +82,7 @@ func (User) Fields() []ent.Field {
 		// change column name from "old_token" to "new_token"
 		// and use Atlas diff hook in the migration.
 		field.String("new_token").
-			DefaultFunc(uuid.NewString),
+			DefaultFunc(func() string { return uuid.New().String() }),
 		// extending the blob size.
 		field.Bytes("blob").
 			Optional().
@@ -122,7 +122,7 @@ func (User) Fields() []ent.Field {
 		// nullable field was changed to non-nullable without a static
 		// default value, and it requires apply hook to fix this.
 		field.String("drop_optional").
-			DefaultFunc(uuid.NewString),
+			DefaultFunc(func() string { return uuid.New().String() }),
 		// deleting the `address` column.
 	}
 }

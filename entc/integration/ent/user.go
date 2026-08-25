@@ -204,15 +204,15 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID, user.FieldOptionalInt, user.FieldAge, user.FieldFilesCount:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case user.FieldName, user.FieldLast, user.FieldNickname, user.FieldAddress, user.FieldPhone, user.FieldPassword, user.FieldRole, user.FieldEmployment, user.FieldSSOCert:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case user.ForeignKeys[0]: // group_blocked
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case user.ForeignKeys[1]: // user_spouse
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case user.ForeignKeys[2]: // user_parent
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -229,103 +229,103 @@ func (_m *User) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case user.FieldOptionalInt:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field optional_int", values[i])
 			} else if value.Valid {
-				_m.OptionalInt = int(value.Int64)
+				_m.OptionalInt = int(value.V)
 			}
 		case user.FieldAge:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field age", values[i])
 			} else if value.Valid {
-				_m.Age = int(value.Int64)
+				_m.Age = int(value.V)
 			}
 		case user.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.Name = string(value.V)
 			}
 		case user.FieldLast:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field last", values[i])
 			} else if value.Valid {
-				_m.Last = value.String
+				_m.Last = string(value.V)
 			}
 		case user.FieldNickname:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field nickname", values[i])
 			} else if value.Valid {
-				_m.Nickname = value.String
+				_m.Nickname = string(value.V)
 			}
 		case user.FieldAddress:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field address", values[i])
 			} else if value.Valid {
-				_m.Address = value.String
+				_m.Address = string(value.V)
 			}
 		case user.FieldPhone:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field phone", values[i])
 			} else if value.Valid {
-				_m.Phone = value.String
+				_m.Phone = string(value.V)
 			}
 		case user.FieldPassword:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
-				_m.Password = value.String
+				_m.Password = string(value.V)
 			}
 		case user.FieldRole:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field role", values[i])
 			} else if value.Valid {
-				_m.Role = user.Role(value.String)
+				_m.Role = user.Role(value.V)
 			}
 		case user.FieldEmployment:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field employment", values[i])
 			} else if value.Valid {
-				_m.Employment = user.Employment(value.String)
+				_m.Employment = user.Employment(value.V)
 			}
 		case user.FieldSSOCert:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field SSOCert", values[i])
 			} else if value.Valid {
-				_m.SSOCert = value.String
+				_m.SSOCert = string(value.V)
 			}
 		case user.FieldFilesCount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field files_count", values[i])
 			} else if value.Valid {
-				_m.FilesCount = int(value.Int64)
+				_m.FilesCount = int(value.V)
 			}
 		case user.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field group_blocked", value)
 			} else if value.Valid {
 				_m.group_blocked = new(int)
-				*_m.group_blocked = int(value.Int64)
+				*_m.group_blocked = int(value.V)
 			}
 		case user.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_spouse", value)
 			} else if value.Valid {
 				_m.user_spouse = new(int)
-				*_m.user_spouse = int(value.Int64)
+				*_m.user_spouse = int(value.V)
 			}
 		case user.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_parent", value)
 			} else if value.Valid {
 				_m.user_parent = new(int)
-				*_m.user_parent = int(value.Int64)
+				*_m.user_parent = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

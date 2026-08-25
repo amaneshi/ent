@@ -55,9 +55,9 @@ func (*GroupInfo) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case groupinfo.FieldID, groupinfo.FieldMaxUsers:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case groupinfo.FieldDesc:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -74,22 +74,22 @@ func (_m *GroupInfo) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case groupinfo.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case groupinfo.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
 			} else if value.Valid {
-				_m.Desc = value.String
+				_m.Desc = string(value.V)
 			}
 		case groupinfo.FieldMaxUsers:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field max_users", values[i])
 			} else if value.Valid {
-				_m.MaxUsers = int(value.Int64)
+				_m.MaxUsers = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

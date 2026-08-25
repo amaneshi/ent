@@ -9,11 +9,11 @@ package pet
 import (
 	"context"
 	"fmt"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/examples/migration/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // Mutation represents an operation that mutates the Pet nodes in the graph.

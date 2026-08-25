@@ -80,7 +80,7 @@ func (*Doc) scanValues(columns []string) ([]any, error) {
 		case doc.FieldID:
 			values[i] = new(schema.DocID)
 		case doc.FieldText:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case doc.ForeignKeys[0]: // doc_children
 			values[i] = &sql.NullScanner{S: new(schema.DocID)}
 		default:
@@ -105,10 +105,10 @@ func (_m *Doc) assignValues(columns []string, values []any) error {
 				_m.ID = *value
 			}
 		case doc.FieldText:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field text", values[i])
 			} else if value.Valid {
-				_m.Text = value.String
+				_m.Text = string(value.V)
 			}
 		case doc.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {

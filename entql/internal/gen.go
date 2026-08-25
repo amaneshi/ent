@@ -80,7 +80,7 @@ func ident(t field.Type) string {
 	case field.TypeTime:
 		return "time"
 	case field.TypeUUID:
-		return "value"
+		return "uuid"
 	case field.TypeOther:
 		return "other"
 	default:
@@ -89,7 +89,7 @@ func ident(t field.Type) string {
 }
 
 func typ(t field.Type) string {
-	if t == field.TypeUUID || t == field.TypeOther {
+	if t == field.TypeOther {
 		return "driver.Valuer"
 	}
 	return t.String()

@@ -45,11 +45,11 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 		case comment.FieldDir:
 			values[i] = new([]byte)
 		case comment.FieldUniqueFloat:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.Null[float64])
 		case comment.FieldID, comment.FieldUniqueInt, comment.FieldNillableInt:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case comment.FieldTable, comment.FieldClient:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -66,35 +66,35 @@ func (_m *Comment) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case comment.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case comment.FieldUniqueInt:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field unique_int", values[i])
 			} else if value.Valid {
-				_m.UniqueInt = int(value.Int64)
+				_m.UniqueInt = int(value.V)
 			}
 		case comment.FieldUniqueFloat:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.Null[float64]); !ok {
 				return fmt.Errorf("unexpected type %T for field unique_float", values[i])
 			} else if value.Valid {
-				_m.UniqueFloat = value.Float64
+				_m.UniqueFloat = float64(value.V)
 			}
 		case comment.FieldNillableInt:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field nillable_int", values[i])
 			} else if value.Valid {
 				_m.NillableInt = new(int)
-				*_m.NillableInt = int(value.Int64)
+				*_m.NillableInt = int(value.V)
 			}
 		case comment.FieldTable:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field table", values[i])
 			} else if value.Valid {
-				_m.Table = value.String
+				_m.Table = string(value.V)
 			}
 		case comment.FieldDir:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -105,10 +105,10 @@ func (_m *Comment) assignValues(columns []string, values []any) error {
 				}
 			}
 		case comment.FieldClient:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field client", values[i])
 			} else if value.Valid {
-				_m.Client = value.String
+				_m.Client = string(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

@@ -61,11 +61,11 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		case user.FieldTags:
 			values[i] = new([]byte)
 		case user.FieldAge:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.Null[float64])
 		case user.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case user.FieldFirstName, user.FieldLastName:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -82,28 +82,28 @@ func (_m *User) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case user.FieldAge:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.Null[float64]); !ok {
 				return fmt.Errorf("unexpected type %T for field age", values[i])
 			} else if value.Valid {
-				_m.Age = value.Float64
+				_m.Age = float64(value.V)
 			}
 		case user.FieldFirstName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field first_name", values[i])
 			} else if value.Valid {
-				_m.FirstName = value.String
+				_m.FirstName = string(value.V)
 			}
 		case user.FieldLastName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field last_name", values[i])
 			} else if value.Valid {
-				_m.LastName = value.String
+				_m.LastName = string(value.V)
 			}
 		case user.FieldTags:
 			if value, ok := values[i].(*[]byte); !ok {

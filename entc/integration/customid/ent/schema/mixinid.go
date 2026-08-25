@@ -5,11 +5,12 @@
 package schema
 
 import (
+	"uuid"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
-	"github.com/google/uuid"
 )
 
 // BaseMixin holds the schema definition for the BaseMixin entity.
@@ -20,7 +21,7 @@ type BaseMixin struct {
 // Fields of the Mixin.
 func (BaseMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).Default(uuid.New),
+		field.UUID("id").Default(uuid.New),
 		field.String("some_field"),
 	}
 }

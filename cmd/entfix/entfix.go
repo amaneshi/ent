@@ -97,7 +97,7 @@ func (cmd *GlobalID) Run(ctx context.Context) error {
 	}
 	is := make(gen.IncrementStarts, len(ts))
 	for i, t := range ts {
-		is[t] = int64(i << 32)
+		is[t] = i << 32
 	}
 	if err := is.WriteToDisk(cmd.Path); err != nil {
 		return err

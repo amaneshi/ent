@@ -61,7 +61,7 @@ type marshalerEncoder struct {
 }
 
 func (enc marshalerEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
-	marshaler := enc.Type.UnsafeIndirect(ptr).(Marshaler)
+	marshaler := enc.UnsafeIndirect(ptr).(Marshaler)
 	enc.encode(marshaler, stream)
 }
 

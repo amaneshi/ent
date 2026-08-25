@@ -55,6 +55,13 @@ func ({{ $receiver }} *{{ $builder }}) sqlSave(ctx context.Context) (*{{ $.Name 
 				{{- if $.ID.Type.ValueScanner }}
 					} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 						return nil, err
+				{{- else if $.ID.IsUUID }}
+					} else {
+						var nid {{ $.ID.ScanType }}
+						if err := nid.Scan(_spec.ID.Value); err != nil {
+							return nil, err
+						}
+						_node.ID = {{ $.ID.ScanTypeField "nid" }}
 				{{- else  }}
 					} else {
 						return nil, fmt.Errorf("unexpected {{ $.Name }}.ID type: %T", _spec.ID.Value)

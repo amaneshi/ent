@@ -1686,9 +1686,9 @@ func (*user) values(columns []string) ([]any, error) {
 	for i := range columns {
 		switch c := columns[i]; c {
 		case "id", "age", "best_friend_id", "fk1", "fk2":
-			values[i] = &sql.NullInt64{}
+			values[i] = &sql.Null[int64]{}
 		case "name":
-			values[i] = &sql.NullString{}
+			values[i] = &sql.Null[string]{}
 		default:
 			return nil, fmt.Errorf("unexpected column %q", c)
 		}
@@ -1703,17 +1703,17 @@ func (u *user) assign(columns []string, values []any) error {
 	for i, c := range columns {
 		switch c {
 		case "id":
-			u.id = int(values[i].(*sql.NullInt64).Int64)
+			u.id = int(values[i].(*sql.Null[int64]).V)
 		case "age":
-			u.age = int(values[i].(*sql.NullInt64).Int64)
+			u.age = int(values[i].(*sql.Null[int64]).V)
 		case "name":
-			u.name = values[i].(*sql.NullString).String
+			u.name = values[i].(*sql.Null[string]).V
 		case "best_friend_id":
-			u.bfID = int(values[i].(*sql.NullInt64).Int64)
+			u.bfID = int(values[i].(*sql.Null[int64]).V)
 		case "fk1":
-			u.edges.fk1 = int(values[i].(*sql.NullInt64).Int64)
+			u.edges.fk1 = int(values[i].(*sql.Null[int64]).V)
 		case "fk2":
-			u.edges.fk2 = int(values[i].(*sql.NullInt64).Int64)
+			u.edges.fk2 = int(values[i].(*sql.Null[int64]).V)
 		default:
 			return fmt.Errorf("unknown column %q", c)
 		}
@@ -2544,11 +2544,11 @@ func TestQueryEdges(t *testing.T) {
 				s.Where(sql.InValues("user_id", 1, 2, 3))
 			},
 			ScanValues: func() [2]any {
-				return [2]any{&sql.NullInt64{}, &sql.NullInt64{}}
+				return [2]any{&sql.Null[int64]{}, &sql.Null[int64]{}}
 			},
 			Assign: func(out, in any) error {
-				o, i := out.(*sql.NullInt64), in.(*sql.NullInt64)
-				edges = append(edges, []int64{o.Int64, i.Int64})
+				o, i := out.(*sql.Null[int64]), in.(*sql.Null[int64])
+				edges = append(edges, []int64{o.V, i.V})
 				return nil
 			},
 		}
@@ -2582,11 +2582,11 @@ func TestQueryEdgesSchema(t *testing.T) {
 				s.Where(sql.InValues("user_id", 1, 2, 3))
 			},
 			ScanValues: func() [2]any {
-				return [2]any{&sql.NullInt64{}, &sql.NullInt64{}}
+				return [2]any{&sql.Null[int64]{}, &sql.Null[int64]{}}
 			},
 			Assign: func(out, in any) error {
-				o, i := out.(*sql.NullInt64), in.(*sql.NullInt64)
-				edges = append(edges, []int64{o.Int64, i.Int64})
+				o, i := out.(*sql.Null[int64]), in.(*sql.Null[int64])
+				edges = append(edges, []int64{o.V, i.V})
 				return nil
 			},
 		}

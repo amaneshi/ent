@@ -9,8 +9,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"time"
-
-	"github.com/google/uuid"
+	"uuid"
 )
 
 type (

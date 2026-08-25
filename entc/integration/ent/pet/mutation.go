@@ -10,11 +10,11 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // Mutation represents an operation that mutates the Pet nodes in the graph.

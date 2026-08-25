@@ -57,9 +57,9 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case comment.FieldID, comment.FieldPostID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case comment.FieldText:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -76,22 +76,22 @@ func (_m *Comment) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case comment.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case comment.FieldText:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field text", values[i])
 			} else if value.Valid {
-				_m.Text = value.String
+				_m.Text = string(value.V)
 			}
 		case comment.FieldPostID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field post_id", values[i])
 			} else if value.Valid {
-				_m.PostID = int(value.Int64)
+				_m.PostID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

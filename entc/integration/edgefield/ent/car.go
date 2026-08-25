@@ -9,11 +9,11 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/edgefield/ent/car"
-	"github.com/google/uuid"
 )
 
 // Car is the model entity for the Car schema.
@@ -54,9 +54,9 @@ func (*Car) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case car.FieldNumber:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case car.FieldID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -73,16 +73,16 @@ func (_m *Car) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case car.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				_m.ID = *value
+			} else if value.Valid {
+				_m.ID = uuid.UUID(value.V)
 			}
 		case car.FieldNumber:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field number", values[i])
 			} else if value.Valid {
-				_m.Number = value.String
+				_m.Number = string(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

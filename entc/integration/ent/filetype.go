@@ -57,9 +57,9 @@ func (*FileType) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case filetype.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case filetype.FieldName, filetype.FieldType, filetype.FieldState:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -76,28 +76,28 @@ func (_m *FileType) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case filetype.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case filetype.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.Name = string(value.V)
 			}
 		case filetype.FieldType:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				_m.Type = filetype.Type(value.String)
+				_m.Type = filetype.Type(value.V)
 			}
 		case filetype.FieldState:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field state", values[i])
 			} else if value.Valid {
-				_m.State = filetype.State(value.String)
+				_m.State = filetype.State(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

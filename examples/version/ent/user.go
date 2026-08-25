@@ -33,9 +33,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID, user.FieldVersion:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case user.FieldStatus:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -52,22 +52,22 @@ func (_m *User) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case user.FieldVersion:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field version", values[i])
 			} else if value.Valid {
-				_m.Version = value.Int64
+				_m.Version = int64(value.V)
 			}
 		case user.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				_m.Status = user.Status(value.String)
+				_m.Status = user.Status(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

@@ -173,7 +173,7 @@ func (a *Atlas) NamedDiff(ctx context.Context, name string, tables ...*Table) er
 	case ModeReplay:
 		plan, err = a.planReplay(ctx, name, tables)
 	default:
-		return fmt.Errorf("unknown migration mode: %q", a.mode)
+		return fmt.Errorf("unknown migration mode: %d", a.mode)
 	}
 	switch {
 	case err != nil:
@@ -828,7 +828,7 @@ type db struct{ dialect.ExecQuerier }
 
 func (d *db) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
 	rows := &entsql.Rows{}
-	if err := d.ExecQuerier.Query(ctx, query, args, rows); err != nil {
+	if err := d.Query(ctx, query, args, rows); err != nil {
 		return nil, err
 	}
 	return rows.ColumnScanner.(*sql.Rows), nil
@@ -836,7 +836,7 @@ func (d *db) QueryContext(ctx context.Context, query string, args ...any) (*sql.
 
 func (d *db) ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error) {
 	var r sql.Result
-	if err := d.ExecQuerier.Exec(ctx, query, args, &r); err != nil {
+	if err := d.Exec(ctx, query, args, &r); err != nil {
 		return nil, err
 	}
 	return r, nil
@@ -1024,14 +1024,13 @@ func (a *Atlas) atDefault(c1 *Column, c2 *schema.Column) error {
 		}
 		c2.SetDefault(&schema.RawExpr{X: string(d)})
 	default:
-		switch {
-		case c1.Type == field.TypeJSON:
+		if c1.Type == field.TypeJSON {
 			s, ok := c1.Default.(string)
 			if !ok {
 				return fmt.Errorf("invalid default value for JSON column %q: %v", c1.Name, c1.Default)
 			}
 			c2.SetDefault(&schema.Literal{V: strings.ReplaceAll(s, "'", "''")})
-		default:
+		} else {
 			// Keep backwards compatibility with the old default value format.
 			x := fmt.Sprint(c1.Default)
 			if v, ok := c1.Default.(string); ok && c1.Type != field.TypeUUID && c1.Type != field.TypeTime {

@@ -7,8 +7,7 @@ package schema
 import (
 	"database/sql/driver"
 	"fmt"
-
-	"github.com/google/uuid"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
@@ -67,7 +66,7 @@ type ID [64]byte
 
 func NewID() ID {
 	var id [64]byte
-	copy(id[:], uuid.NewString()+uuid.NewString()+uuid.NewString()+uuid.NewString())
+	copy(id[:], uuid.New().String()+uuid.New().String()+uuid.New().String()+uuid.New().String())
 	return id
 }
 

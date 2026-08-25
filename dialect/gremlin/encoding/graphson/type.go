@@ -7,6 +7,7 @@ package graphson
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 	"unsafe"
 
@@ -55,12 +56,7 @@ type Types []Type
 
 // Contains reports whether a slice of types contains a particular type.
 func (types Types) Contains(typ Type) bool {
-	for i := range types {
-		if types[i] == typ {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(types, typ)
 }
 
 // String implements fmt.Stringer interface.
@@ -140,7 +136,7 @@ type typerEncoder struct {
 }
 
 func (enc typerEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
-	enc.typeEncoder.Type = enc.typerOf(ptr).GraphsonType()
+	enc.Type = enc.typerOf(ptr).GraphsonType()
 	enc.typeEncoder.Encode(ptr, stream)
 }
 
@@ -150,6 +146,6 @@ type typerDecoder struct {
 }
 
 func (dec typerDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
-	dec.typeDecoder.typeChecker = dec.typerOf(ptr).GraphsonType()
+	dec.typeChecker = dec.typerOf(ptr).GraphsonType()
 	dec.typeDecoder.Decode(ptr, iter)
 }

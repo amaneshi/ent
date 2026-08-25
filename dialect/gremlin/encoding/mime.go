@@ -19,7 +19,7 @@ var (
 // NewMime creates a wire format mime header.
 func NewMime(s string) Mime {
 	var buf bytes.Buffer
-	buf.WriteByte(byte(len(s)))
+	buf.WriteByte(byte(len(s))) //nolint:gosec // Safe
 	buf.WriteString(s)
 	return buf.Bytes()
 }

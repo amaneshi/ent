@@ -52,11 +52,11 @@ func (*Task) scanValues(columns []string) ([]any, error) {
 		case enttask.FieldPriorities:
 			values[i] = new([]byte)
 		case enttask.FieldID, enttask.FieldPriority, enttask.FieldOrder, enttask.FieldOrderOption:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case enttask.FieldName, enttask.FieldOwner, enttask.FieldOp:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case enttask.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -73,16 +73,16 @@ func (_m *Task) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case enttask.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case enttask.FieldPriority:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field priority", values[i])
 			} else if value.Valid {
-				_m.Priority = task.Priority(value.Int64)
+				_m.Priority = task.Priority(value.V)
 			}
 		case enttask.FieldPriorities:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -93,41 +93,41 @@ func (_m *Task) assignValues(columns []string, values []any) error {
 				}
 			}
 		case enttask.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				_m.CreatedAt = new(time.Time)
-				*_m.CreatedAt = value.Time
+				*_m.CreatedAt = time.Time(value.V)
 			}
 		case enttask.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.Name = string(value.V)
 			}
 		case enttask.FieldOwner:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field owner", values[i])
 			} else if value.Valid {
-				_m.Owner = value.String
+				_m.Owner = string(value.V)
 			}
 		case enttask.FieldOrder:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field order", values[i])
 			} else if value.Valid {
-				_m.Order = int(value.Int64)
+				_m.Order = int(value.V)
 			}
 		case enttask.FieldOrderOption:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field order_option", values[i])
 			} else if value.Valid {
-				_m.OrderOption = int(value.Int64)
+				_m.OrderOption = int(value.V)
 			}
 		case enttask.FieldOp:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field op", values[i])
 			} else if value.Valid {
-				_m.Op = value.String
+				_m.Op = string(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

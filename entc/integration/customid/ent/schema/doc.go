@@ -7,12 +7,12 @@ package schema
 import (
 	"database/sql/driver"
 	"fmt"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 
 	"ariga.io/atlas/sql/postgres"
 )
@@ -32,7 +32,7 @@ func (Doc) Fields() []ent.Field {
 			Unique().
 			Immutable().
 			DefaultFunc(func() DocID {
-				return DocID(uuid.NewString())
+				return DocID(uuid.New().String())
 			}).
 			SchemaType(map[string]string{
 				dialect.Postgres: postgres.TypeUUID,

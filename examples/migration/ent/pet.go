@@ -9,12 +9,12 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/examples/migration/ent/pet"
 	"entgo.io/ent/examples/migration/ent/user"
-	"github.com/google/uuid"
 )
 
 // Pet is the model entity for the Pet schema.
@@ -77,13 +77,13 @@ func (*Pet) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case pet.FieldAge, pet.FieldWeight:
-			values[i] = new(sql.NullFloat64)
+			values[i] = new(sql.Null[float64])
 		case pet.FieldOwnerID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case pet.FieldName:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case pet.FieldID, pet.FieldBestFriendID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -100,40 +100,40 @@ func (_m *Pet) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case pet.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				_m.ID = *value
+			} else if value.Valid {
+				_m.ID = uuid.UUID(value.V)
 			}
 		case pet.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				_m.Name = value.String
+				_m.Name = string(value.V)
 			}
 		case pet.FieldAge:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.Null[float64]); !ok {
 				return fmt.Errorf("unexpected type %T for field age", values[i])
 			} else if value.Valid {
-				_m.Age = value.Float64
+				_m.Age = float64(value.V)
 			}
 		case pet.FieldWeight:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.Null[float64]); !ok {
 				return fmt.Errorf("unexpected type %T for field weight", values[i])
 			} else if value.Valid {
-				_m.Weight = value.Float64
+				_m.Weight = float64(value.V)
 			}
 		case pet.FieldBestFriendID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field best_friend_id", values[i])
-			} else if value != nil {
-				_m.BestFriendID = *value
+			} else if value.Valid {
+				_m.BestFriendID = uuid.UUID(value.V)
 			}
 		case pet.FieldOwnerID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field owner_id", values[i])
 			} else if value.Valid {
-				_m.OwnerID = int(value.Int64)
+				_m.OwnerID = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

@@ -2,11 +2,9 @@
 # This source code is licensed under the Apache 2.0 license found
 # in the LICENSE file in the root directory of this source tree.
 
-version: "3.7"
-
 services:
 
-  mysql:
+  mysql56:
     platform: linux/amd64
     image: mysql:5.6.35
     environment:
@@ -41,7 +39,7 @@ services:
 
   mariadb:
     platform: linux/amd64
-    image: mariadb
+    image: mariadb:10.4 # Temporary
     environment:
       MYSQL_DATABASE: test
       MYSQL_ROOT_PASSWORD: pass
@@ -162,8 +160,9 @@ services:
 
   gremlin:
     platform: linux/amd64
-    image: entgo/gremlin-server
+    image: entgo/gremlin-server:latest
     build: compose/gremlin-server
-    restart: on-failure
+    healthcheck:
+      test: "netstat -an | grep -q 8182"
     ports:
       - 8182:8182

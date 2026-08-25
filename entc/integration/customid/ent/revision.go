@@ -29,7 +29,7 @@ func (*Revision) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case revision.FieldID:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -46,10 +46,10 @@ func (_m *Revision) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case revision.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				_m.ID = value.String
+				_m.ID = string(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

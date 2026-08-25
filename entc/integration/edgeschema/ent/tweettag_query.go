@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -19,7 +20,6 @@ import (
 	"entgo.io/ent/entc/integration/edgeschema/ent/tweet"
 	"entgo.io/ent/entc/integration/edgeschema/ent/tweettag"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // TweetTagQuery is the builder for querying TweetTag entities.

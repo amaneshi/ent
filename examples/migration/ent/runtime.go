@@ -7,13 +7,14 @@
 package ent
 
 import (
+	"uuid"
+
 	"entgo.io/ent/examples/migration/ent/card"
 	"entgo.io/ent/examples/migration/ent/payment"
 	"entgo.io/ent/examples/migration/ent/pet"
 	"entgo.io/ent/examples/migration/ent/schema"
 	"entgo.io/ent/examples/migration/ent/session"
 	"entgo.io/ent/examples/migration/ent/sessiondevice"
-	"github.com/google/uuid"
 )
 
 // The init function reads all schema descriptors with runtime code

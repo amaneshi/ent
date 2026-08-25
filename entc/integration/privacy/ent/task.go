@@ -9,12 +9,12 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/privacy/ent/task"
 	"entgo.io/ent/entc/integration/privacy/ent/user"
-	"github.com/google/uuid"
 )
 
 // Task is the model entity for the Task schema.
@@ -74,13 +74,13 @@ func (*Task) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case task.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case task.FieldTitle, task.FieldDescription, task.FieldStatus:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case task.FieldUUID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		case task.ForeignKeys[0]: // user_tasks
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -97,41 +97,41 @@ func (_m *Task) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case task.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case task.FieldTitle:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
-				_m.Title = value.String
+				_m.Title = string(value.V)
 			}
 		case task.FieldDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				_m.Description = value.String
+				_m.Description = string(value.V)
 			}
 		case task.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				_m.Status = task.Status(value.String)
+				_m.Status = task.Status(value.V)
 			}
 		case task.FieldUUID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field uuid", values[i])
-			} else if value != nil {
-				_m.UUID = *value
+			} else if value.Valid {
+				_m.UUID = uuid.UUID(value.V)
 			}
 		case task.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_tasks", value)
 			} else if value.Valid {
 				_m.user_tasks = new(int)
-				*_m.user_tasks = int(value.Int64)
+				*_m.user_tasks = int(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

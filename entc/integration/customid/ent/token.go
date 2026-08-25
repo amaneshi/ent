@@ -59,7 +59,7 @@ func (*Token) scanValues(columns []string) ([]any, error) {
 		case token.FieldID:
 			values[i] = new(sid.ID)
 		case token.FieldBody:
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.Null[string])
 		case token.ForeignKeys[0]: // account_token
 			values[i] = &sql.NullScanner{S: new(sid.ID)}
 		default:
@@ -84,10 +84,10 @@ func (_m *Token) assignValues(columns []string, values []any) error {
 				_m.ID = *value
 			}
 		case token.FieldBody:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.Null[string]); !ok {
 				return fmt.Errorf("unexpected type %T for field body", values[i])
 			} else if value.Valid {
-				_m.Body = value.String
+				_m.Body = string(value.V)
 			}
 		case token.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {

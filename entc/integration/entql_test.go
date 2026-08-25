@@ -7,8 +7,7 @@ package integration
 import (
 	"context"
 	"testing"
-
-	"github.com/google/uuid"
+	"uuid"
 
 	"entgo.io/ent/entc/integration/ent"
 	"entgo.io/ent/entc/integration/ent/pet"
@@ -61,10 +60,10 @@ func EntQL(t *testing.T, client *ent.Client) {
 	require.Equal(nati.ID, uq.OnlyIDX(ctx))
 
 	pq := client.Pet.Query()
-	pq.Filter().WhereUUID(entql.ValueEQ(u1))
+	pq.Filter().WhereUUID(entql.UuidEQ(u1))
 	require.Equal(xabi.ID, pq.OnlyIDX(ctx))
 	pq = client.Pet.Query()
-	pq.Filter().WhereUUID(entql.ValueEQ(u2))
+	pq.Filter().WhereUUID(entql.UuidEQ(u2))
 	require.Equal(luna.ID, pq.OnlyIDX(ctx))
 
 	uq = client.User.Query()

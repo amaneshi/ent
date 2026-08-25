@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/entc/integration/privacy/rule"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 // Task defines the schema of a task.
@@ -36,7 +35,7 @@ func (Task) Fields() []ent.Field {
 		field.Enum("status").
 			Values("planned", "in_progress", "closed").
 			Default("planned"),
-		field.UUID("uuid", uuid.UUID{}).
+		field.UUID("uuid").
 			Optional(),
 	}
 }

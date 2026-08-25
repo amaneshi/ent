@@ -5,12 +5,10 @@
 package internal
 
 import (
-	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"entgo.io/ent/entc/gen"
 
@@ -19,7 +17,9 @@ import (
 
 func TestSnapshot_Restore(t *testing.T) {
 	t.Log("Running snapshot-restore integration test")
-	const testPackage = "../integration/privacy/ent"
+	const testModuleDir = "../integration"
+	const testModulePackage = "./privacy/ent"
+	testPackage := filepath.Join(testModuleDir, testModulePackage)
 	err := addConflicts(testPackage)
 	require.NoError(t, err)
 	storage, err := gen.NewStorage("sql")
@@ -39,19 +39,18 @@ func TestSnapshot_Restore(t *testing.T) {
 			`,
 		}}
 	require.NoError(t, snap.Restore())
-	err = exec.Command("go", "generate", testPackage).Run()
+	err = exec.Command("go", "-C", testModuleDir, "generate", testModulePackage).Run()
 	require.NoError(t, err)
 }
 
 // addConflicts adds VCS conflicts to the files that match the given patterns.
 func addConflicts(dir string) error {
-	rand.Seed(time.Now().UnixNano())
 	infos, err := os.ReadDir(dir)
 	if err != nil {
 		return err
 	}
 	for _, info := range infos {
-		if info.IsDir() || info.Name() == "generate.go" {
+		if info.IsDir() || info.Name() == "generate.go" || info.Name() == "entc.go" {
 			continue
 		}
 		path := filepath.Join(dir, info.Name())

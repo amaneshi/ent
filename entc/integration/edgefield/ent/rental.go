@@ -10,13 +10,13 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/edgefield/ent/car"
 	"entgo.io/ent/entc/integration/edgefield/ent/rental"
 	"entgo.io/ent/entc/integration/edgefield/ent/user"
-	"github.com/google/uuid"
 )
 
 // Rental is the model entity for the Rental schema.
@@ -75,11 +75,11 @@ func (*Rental) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case rental.FieldID, rental.FieldUserID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.Null[int64])
 		case rental.FieldDate:
-			values[i] = new(sql.NullTime)
+			values[i] = new(sql.Null[time.Time])
 		case rental.FieldCarID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(sql.Null[uuid.UUID])
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -96,28 +96,28 @@ func (_m *Rental) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case rental.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
+			value, ok := values[i].(*sql.Null[int64])
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int(value.V)
 		case rental.FieldDate:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.Null[time.Time]); !ok {
 				return fmt.Errorf("unexpected type %T for field date", values[i])
 			} else if value.Valid {
-				_m.Date = value.Time
+				_m.Date = time.Time(value.V)
 			}
 		case rental.FieldUserID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.Null[int64]); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.UserID = int(value.Int64)
+				_m.UserID = int(value.V)
 			}
 		case rental.FieldCarID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.Null[uuid.UUID]); !ok {
 				return fmt.Errorf("unexpected type %T for field car_id", values[i])
-			} else if value != nil {
-				_m.CarID = *value
+			} else if value.Valid {
+				_m.CarID = uuid.UUID(value.V)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

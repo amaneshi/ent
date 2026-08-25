@@ -185,7 +185,7 @@ func (c *Conn) sender() error {
 		select {
 		case r := <-c.send:
 			// ensure write completes within a window
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			_ = c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 
 			// fetch next message writer
 			w, err := c.conn.NextWriter(websocket.BinaryMessage)
@@ -225,7 +225,7 @@ func (c *Conn) sender() error {
 
 func (c *Conn) receiver() error {
 	// handle keepalive responses
-	c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error {
 		return c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	})

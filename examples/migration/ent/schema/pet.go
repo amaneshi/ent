@@ -5,12 +5,13 @@
 package schema
 
 import (
+	"uuid"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"github.com/google/uuid"
 )
 
 // Pet holds the schema definition for the Pet entity.
@@ -21,14 +22,14 @@ type Pet struct {
 // Fields of the Pet.
 func (Pet) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.Nil).
+		field.UUID("id").
 			Default(uuid.New),
 		field.String("name"),
 		field.Float("age"),
 		field.Float("weight"),
-		field.UUID("best_friend_id", uuid.Nil).
+		field.UUID("best_friend_id").
 			Annotations(
-				entsql.Default(uuid.Nil.String()),
+				entsql.Default(uuid.Nil().String()),
 			),
 		field.Int("owner_id").
 			Default(0),

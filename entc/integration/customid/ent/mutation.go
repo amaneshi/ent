@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/entc/integration/customid/ent/account"
@@ -33,8 +34,6 @@ import (
 	"entgo.io/ent/entc/integration/customid/ent/user"
 	"entgo.io/ent/entc/integration/customid/ent/valuescan"
 	"entgo.io/ent/entc/integration/customid/sid"
-	uuidc "entgo.io/ent/entc/integration/customid/uuidcompatible"
-	"github.com/google/uuid"
 )
 
 const (
@@ -1088,7 +1087,7 @@ func (m *IntSIDMutation) OldField(ctx context.Context, name string) (ent.Value, 
 type LinkMutation struct {
 	link.Mutation
 	config
-	id       *uuidc.UUIDC
+	id       *uuid.UUID
 	done     bool
 	oldValue func(context.Context) (*Link, error)
 }
@@ -1112,13 +1111,13 @@ func newLinkMutation(c config, op Op, opts ...linkOption) *LinkMutation {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Link entities.
-func (m *LinkMutation) SetID(id uuidc.UUIDC) {
+func (m *LinkMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *LinkMutation) ID() (id uuidc.UUIDC, exists bool) {
+func (m *LinkMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1126,7 +1125,7 @@ func (m *LinkMutation) ID() (id uuidc.UUIDC, exists bool) {
 }
 
 // withLinkID sets the ID field of the mutation.
-func withLinkID(id uuidc.UUIDC) linkOption {
+func withLinkID(id uuid.UUID) linkOption {
 	return func(m *LinkMutation) {
 		var (
 			err   error
@@ -1180,12 +1179,12 @@ func (m LinkMutation) Tx() (*Tx, error) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *LinkMutation) IDs(ctx context.Context) ([]uuidc.UUIDC, error) {
+func (m *LinkMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.Op().Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []uuidc.UUIDC{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.Op().Is(OpUpdate | OpDelete):
