@@ -13,6 +13,7 @@ import (
 	"time"
 	"uuid"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/examples/migration/ent/session"
 	"entgo.io/ent/examples/migration/ent/sessiondevice"
@@ -181,7 +182,11 @@ func (_c *SessionDeviceCreate) sqlSave(ctx context.Context) (*SessionDevice, err
 		if id, ok := _spec.ID.Value.(uuid.UUID); ok {
 			_node.ID = id
 		} else {
-			return nil, fmt.Errorf("unexpected SessionDevice.ID type: %T", _spec.ID.Value)
+			var nid sql.Null[uuid.UUID]
+			if err := nid.Scan(_spec.ID.Value); err != nil {
+				return nil, err
+			}
+			_node.ID = uuid.UUID(nid.V)
 		}
 	}
 	_c.mutation.id = &_node.ID

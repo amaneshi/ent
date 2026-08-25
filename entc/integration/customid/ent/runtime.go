@@ -117,6 +117,10 @@ func init() {
 	linkDescLinkInformation := linkFields[1].Descriptor()
 	// link.DefaultLinkInformation holds the default value on creation for the link_information field.
 	link.DefaultLinkInformation = linkDescLinkInformation.Default.(map[string]schema.LinkInformation)
+	// linkDescID is the schema descriptor for id field.
+	linkDescID := linkFields[0].Descriptor()
+	// link.DefaultID holds the default value on creation for the id field.
+	link.DefaultID = linkDescID.Default.(func() uuid.UUID)
 	mixinidMixin := schema.MixinID{}.Mixin()
 	mixinidMixinFields0 := mixinidMixin[0].Fields()
 	_ = mixinidMixinFields0

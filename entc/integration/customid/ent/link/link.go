@@ -7,6 +7,8 @@
 package link
 
 import (
+	"uuid"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/entc/integration/customid/ent/schema"
 )
@@ -41,6 +43,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultLinkInformation holds the default value on creation for the "link_information" field.
 	DefaultLinkInformation map[string]schema.LinkInformation
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
 
 // OrderOption defines the ordering options for the Link queries.

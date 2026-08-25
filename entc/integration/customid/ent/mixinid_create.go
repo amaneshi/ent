@@ -120,7 +120,11 @@ func (_c *MixinIDCreate) sqlSave(ctx context.Context) (*MixinID, error) {
 		if id, ok := _spec.ID.Value.(uuid.UUID); ok {
 			_node.ID = id
 		} else {
-			return nil, fmt.Errorf("unexpected MixinID.ID type: %T", _spec.ID.Value)
+			var nid sql.Null[uuid.UUID]
+			if err := nid.Scan(_spec.ID.Value); err != nil {
+				return nil, err
+			}
+			_node.ID = uuid.UUID(nid.V)
 		}
 	}
 	_c.mutation.id = &_node.ID

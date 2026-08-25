@@ -163,7 +163,6 @@ func scanType(typ reflect.Type, columns []string) (*rowScan, error) {
 
 var (
 	timeType     = reflect.TypeFor[time.Time]()
-	uuidType     = reflect.TypeFor[uuid.UUID]()
 	scannerType  = reflect.TypeFor[sql.Scanner]()
 	nullJSONType = reflect.TypeFor[nullJSON]()
 )
@@ -368,6 +367,8 @@ func ScanTypeOf(rows *Rows, i int) any {
 	default:
 		if k == reflect.Struct && rt == timeType {
 			rt = reflect.TypeFor[sql.Null[time.Time]]()
+		} else if strings.EqualFold(ct[i].DatabaseTypeName(), "UUID") {
+			rt = reflect.TypeFor[sql.Null[uuid.UUID]]()
 		}
 	}
 	return reflect.New(rt).Interface()
@@ -417,6 +418,10 @@ func (s SelectValues) Get(name string) (any, error) {
 	case sql.NullTime:
 		if rv.Valid {
 			return rv.Time, nil
+		}
+	case sql.Null[uuid.UUID]:
+		if rv.Valid {
+			return rv.V, nil
 		}
 	case sql.RawBytes:
 		return []byte(rv), nil

@@ -833,10 +833,8 @@ func Select(t *testing.T, client *ent.Client) {
 		require.True(!tv.IsZero())
 		u, err := p.Value(as3)
 		require.NoError(err)
-		us, ok := u.(string)
+		uu, ok := u.(uuid.UUID)
 		require.True(ok)
-		uu, err := uuid.Parse(us)
-		require.NoError(err)
 		require.True(uu != uuid.Nil())
 	}
 

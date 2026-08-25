@@ -40,6 +40,14 @@ func (_c *LinkCreate) SetID(v uuid.UUID) *LinkCreate {
 	return _c
 }
 
+// SetNillableID sets the "id" field if the given value is not nil.
+func (_c *LinkCreate) SetNillableID(v *uuid.UUID) *LinkCreate {
+	if v != nil {
+		_c.SetID(*v)
+	}
+	return _c
+}
+
 // Mutation returns the LinkMutation object of the builder.
 func (_c *LinkCreate) Mutation() *LinkMutation {
 	return _c.mutation
@@ -79,6 +87,10 @@ func (_c *LinkCreate) defaults() {
 		v := link.DefaultLinkInformation
 		_c.mutation.SetLinkInformation(v)
 	}
+	if _, ok := _c.mutation.ID(); !ok {
+		v := link.DefaultID()
+		_c.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -104,7 +116,11 @@ func (_c *LinkCreate) sqlSave(ctx context.Context) (*Link, error) {
 		if id, ok := _spec.ID.Value.(uuid.UUID); ok {
 			_node.ID = id
 		} else {
-			return nil, fmt.Errorf("unexpected Link.ID type: %T", _spec.ID.Value)
+			var nid sql.Null[uuid.UUID]
+			if err := nid.Scan(_spec.ID.Value); err != nil {
+				return nil, err
+			}
+			_node.ID = uuid.UUID(nid.V)
 		}
 	}
 	_c.mutation.id = &_node.ID

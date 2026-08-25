@@ -5,6 +5,8 @@
 package schema
 
 import (
+	"uuid"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -22,7 +24,8 @@ type Link struct {
 // Fields of the IntSid.
 func (Link) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id"),
+		field.UUID("id").
+			Default(uuid.New),
 		field.JSON("link_information", map[string]LinkInformation{}).
 			Default(map[string]LinkInformation{
 				"ent": {
